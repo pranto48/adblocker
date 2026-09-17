@@ -6,7 +6,7 @@
  * ==============================================================================
  *
  * AmpBlock - Background Service Worker (Manifest V3)
- * Controls DNR rules, domain whitelist allow-system, tab badges, context menus, and storage stats.
+ * Controls DNR rules, popup tab auto-closer, domain whitelist, tab badges, and context menus.
  */
 
 // In-memory tab counts
@@ -21,6 +21,36 @@ function extractHostname(url) {
   } catch (e) {
     return '';
   }
+}
+
+// Common ad network keywords for auto-closing popup tabs
+const adTabKeywords = [
+  'popads',
+  'popcash',
+  'propeller',
+  'exoclick',
+  'trafficjunky',
+  'clickadu',
+  'hilltopads',
+  'monetag',
+  'adsterra',
+  'adtrue',
+  'richads',
+  'yllix',
+  'betting',
+  'casino',
+  'redirect',
+  'rotator',
+  'tsyndicate',
+  'traffichive',
+  'adnuntius',
+  'wigetmedia'
+];
+
+function isAdTabUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const lower = url.toLowerCase();
+  return adTabKeywords.some(kw => lower.includes(kw));
 }
 
 // Initial setup on install/update
@@ -45,15 +75,40 @@ chrome.runtime.onInstalled.addListener(async () => {
     await chrome.storage.local.set({ customBlockedSelectors: {} });
   }
 
-  // Setup Context Menus
   setupContextMenus();
 
-  // Ensure default badge styling
   try {
     chrome.action.setBadgeBackgroundColor({ color: '#00d2ff' });
   } catch (e) {}
 
   await syncDynamicRules();
+});
+
+// Auto-Kill Popup Tabs spawned by ad scripts
+chrome.tabs.onCreated.addListener((tab) => {
+  if (!tab.openerTabId) return; // Legitimate new tab created directly by user
+
+  const targetUrl = tab.pendingUrl || tab.url || '';
+  if (isAdTabUrl(targetUrl)) {
+    chrome.tabs.remove(tab.id);
+    console.warn('[AmpBlock] Auto-closed ad popup tab:', targetUrl);
+  }
+});
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  // If tab was spawned by another tab and attempts to navigate to an ad network
+  if (tab.openerTabId && changeInfo.url) {
+    if (isAdTabUrl(changeInfo.url)) {
+      chrome.tabs.remove(tabId);
+      console.warn('[AmpBlock] Auto-closed redirected ad tab:', changeInfo.url);
+      return;
+    }
+  }
+
+  if (changeInfo.status === 'loading') {
+    tabStats.set(tabId, 0);
+    chrome.action.setBadgeText({ text: '', tabId });
+  }
 });
 
 // Setup Context Menus
@@ -94,7 +149,6 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
   if (info.menuItemId === 'ampblock_zap') {
     chrome.tabs.sendMessage(tab.id, { action: 'triggerZapper' }).catch(() => {
-      // If script not loaded, inject it
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: ['content/element-zapper.js']
@@ -163,10 +217,11 @@ async function syncDynamicRules() {
         condition: {
           initiatorDomains: [domain],
           resourceTypes: [
+            'main_frame',
+            'sub_frame',
             'script',
             'image',
             'xmlhttprequest',
-            'sub_frame',
             'ping',
             'media',
             'other'
@@ -388,12 +443,4 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Clean up tabs on close
 chrome.tabs.onRemoved.addListener((tabId) => {
   tabStats.delete(tabId);
-});
-
-// Reset count when tab navigates to a new page
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'loading') {
-    tabStats.set(tabId, 0);
-    chrome.action.setBadgeText({ text: '', tabId });
-  }
 });

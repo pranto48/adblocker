@@ -6,9 +6,9 @@
 ==============================================================================
 */
 
-/* AmpBlock Pro - Universal Cosmetic Ad Filter */
+/* AmpBlock Pro - Universal Space-Collapsing Cosmetic Ad Filter */
 
-/* Standard Web Ad Banners & Containers */
+/* Standard Web Ad Banners, Placeholders & Skeletons */
 ins.adsbygoogle,
 [id^="google_ads_"],
 [id^="div-gpt-ad-"],
@@ -33,6 +33,10 @@ iframe[src*="criteo.com"],
 iframe[src*="amazon-adsystem.com"],
 iframe[src*="taboola.com"],
 iframe[src*="outbrain.com"],
+iframe[src*="popads.net"],
+iframe[src*="popcash.net"],
+iframe[src*="propellerads.com"],
+iframe[src*="exoclick.com"],
 .advertisement,
 .ad-container,
 .ad-placement,
@@ -40,8 +44,12 @@ iframe[src*="outbrain.com"],
 .ad-box,
 .ad-unit,
 .ad-placeholder,
+.ad-space,
+.ad-holder,
+.ad-module,
 .sponsored-post,
 .sponsored-content,
+.sponsored-article,
 [aria-label="advertisement" i],
 [aria-label="sponsored" i],
 [aria-label="ads" i],
@@ -49,10 +57,21 @@ iframe[src*="outbrain.com"],
 .trc_rbox_div,
 .OUTBRAIN,
 div[data-ad],
+div[data-ad-id],
 aside.ad-sidebar,
 .floating-ad,
+.floating-banner,
 .sticky-ad-bottom,
-.sticky-ad-top {
+.sticky-ad-top,
+.ad-bottom-bar,
+.ad-fixed,
+.ad-sticky,
+.ad-label,
+.ad-title,
+.text-ad,
+.native-ad,
+.feed-ad,
+.video-ad-container {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -63,6 +82,11 @@ aside.ad-sidebar,
   min-height: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
+  border: none !important;
+  outline: none !important;
   overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
   z-index: -9999 !important;
 }

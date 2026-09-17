@@ -6,7 +6,7 @@
  * ==============================================================================
  *
  * AmpBlock - Universal Content Script
- * Monitors DOM for ad elements, tracks counts, applies custom zapped rules, and syncs with background worker.
+ * Monitors DOM for ad elements, tracks counts, collapses empty ad frames, and syncs with background worker.
  */
 
 (function () {
@@ -45,6 +45,10 @@
     'iframe[src*="amazon-adsystem.com"]',
     'iframe[src*="taboola.com"]',
     'iframe[src*="outbrain.com"]',
+    'iframe[src*="popads.net"]',
+    'iframe[src*="popcash.net"]',
+    'iframe[src*="propellerads.com"]',
+    'iframe[src*="exoclick.com"]',
     '.advertisement',
     '.ad-container',
     '.ad-placement',
@@ -52,6 +56,7 @@
     '.ad-box',
     '.ad-unit',
     '.ad-placeholder',
+    '.ad-space',
     '.sponsored-post',
     '.sponsored-content',
     '[aria-label="advertisement" i]',
@@ -59,7 +64,12 @@
     '[aria-label="ads" i]',
     '.trc_related_container',
     '.OUTBRAIN',
-    'div[data-ad]'
+    'div[data-ad]',
+    '.floating-ad',
+    '.floating-banner',
+    '.sticky-ad-bottom',
+    '.ad-bottom-bar',
+    '.ad-sticky'
   ];
 
   let fullSelector = adSelectors.join(', ');
@@ -82,6 +92,9 @@
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
             pointer-events: none !important;
           }
         `;
@@ -113,7 +126,7 @@
     );
   }
 
-  // Scan document for ad elements
+  // Scan document for ad elements and aggressively collapse them
   function scanAndPurge() {
     if (!isEnabled || isWhitelisted) return;
 
@@ -127,6 +140,10 @@
           processedNodes.add(el);
           el.style.setProperty('display', 'none', 'important');
           el.style.setProperty('visibility', 'hidden', 'important');
+          el.style.setProperty('height', '0', 'important');
+          el.style.setProperty('min-height', '0', 'important');
+          el.style.setProperty('margin', '0', 'important');
+          el.style.setProperty('padding', '0', 'important');
           newlyBlocked++;
         }
       }
@@ -135,9 +152,7 @@
         blockedCount += newlyBlocked;
         notifyBackground(newlyBlocked);
       }
-    } catch (e) {
-      // Ignore query errors
-    }
+    } catch (e) {}
   }
 
   // Send stats to service worker
@@ -164,7 +179,7 @@
       if (debounceTimeout) clearTimeout(debounceTimeout);
       debounceTimeout = setTimeout(() => {
         scanAndPurge();
-      }, 150);
+      }, 100);
     });
 
     observer.observe(document.documentElement || document.body, {
@@ -190,7 +205,6 @@
       loadCustomRules();
       sendResponse({ success: true });
     } else if (msg.action === 'triggerZapper') {
-      // Dynamically load element-zapper.js if not already present
       if (typeof window.__ampblock_exit_zapper === 'function') {
         window.__ampblock_exit_zapper();
       }
