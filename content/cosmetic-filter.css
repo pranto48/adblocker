@@ -1,0 +1,68 @@
+/*
+==============================================================================
+# Copyright (c) 2026 IT support BD (https://itsupport.com.bd)
+# Made By Arif (https://arifmahmud.com/)
+# Project: AmpBlock
+==============================================================================
+*/
+
+/* AmpBlock Pro - Universal Cosmetic Ad Filter */
+
+/* Standard Web Ad Banners & Containers */
+ins.adsbygoogle,
+[id^="google_ads_"],
+[id^="div-gpt-ad-"],
+[class^="google-ad-"],
+[id*="_ad_container"],
+[class*="_ad_container"],
+[id*="ad-wrapper"],
+[class*="ad-wrapper"],
+[id*="ad-banner"],
+[class*="ad-banner"],
+[id*="banner-ad"],
+[class*="banner-ad"],
+[data-ad-unit],
+[data-ad-slot],
+[data-ad-name],
+[data-ad-client],
+[data-google-query-id],
+iframe[src*="doubleclick.net"],
+iframe[src*="googlesyndication.com"],
+iframe[src*="adnxs.com"],
+iframe[src*="criteo.com"],
+iframe[src*="amazon-adsystem.com"],
+iframe[src*="taboola.com"],
+iframe[src*="outbrain.com"],
+.advertisement,
+.ad-container,
+.ad-placement,
+.ad-slot,
+.ad-box,
+.ad-unit,
+.ad-placeholder,
+.sponsored-post,
+.sponsored-content,
+[aria-label="advertisement" i],
+[aria-label="sponsored" i],
+[aria-label="ads" i],
+.trc_related_container,
+.trc_rbox_div,
+.OUTBRAIN,
+div[data-ad],
+aside.ad-sidebar,
+.floating-ad,
+.sticky-ad-bottom,
+.sticky-ad-top {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  z-index: -9999 !important;
+}
