@@ -6,7 +6,7 @@
 ==============================================================================
 -->
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,28 +19,32 @@
     <header class="header">
       <div class="logo-area">
         <div class="shield-icon-wrapper" id="shieldLogo">
-          <svg viewBox="0 0 256 256" class="shield-svg" width="28" height="28">
-            <path d="M128 20 C180 20 220 40 220 80 C220 160 160 215 128 236 C96 215 36 160 36 80 C36 40 76 20 128 20 Z" 
-                  fill="#0a192f" stroke="#00f2fe" stroke-width="12"/>
-            <polygon points="135,50 95,130 130,130 115,205 165,115 130,115" fill="#00f2fe"/>
+          <svg viewBox="0 0 512 512" class="shield-svg" width="30" height="30">
+            <polygon points="256,22 445,86 445,310 256,490 67,310 67,86" fill="#0a192f" stroke="#00f2fe" stroke-width="28" stroke-linejoin="round"/>
+            <polygon points="256,110 198,255 236,255 272,175 256,110" fill="#ffffff"/>
+            <polygon points="198,255 146,396 192,396 232,284 192,284" fill="#00f2fe"/>
+            <polygon points="256,110 314,255 276,255 240,175 256,110" fill="#ffffff"/>
+            <polygon points="314,255 366,396 320,396 280,284 320,284" fill="#00f2fe"/>
+            <rect x="144" y="240" width="224" height="42" rx="8" fill="#00f2fe" stroke="#ffffff" stroke-width="8"/>
+            <polygon points="256,230 274,261 256,292 238,261" fill="#ffffff"/>
           </svg>
           <span class="pulse-ring"></span>
         </div>
         <div class="brand-info">
           <h1>AmpBlock <span class="badge-pro">PRO</span></h1>
-          <p class="subtitle" id="statusSubtitle">সুরক্ষা সক্রিয় রয়েছে</p>
+          <p class="subtitle" id="statusSubtitle">Protection Active</p>
         </div>
       </div>
 
       <!-- Header Action Buttons -->
       <div class="header-actions">
-        <button id="openSettingsBtn" class="icon-btn" title="সেটিংস ড্যাশবোর্ড">
+        <button id="openSettingsBtn" class="icon-btn" title="Settings Dashboard">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
         </button>
-        <button id="masterToggle" class="power-btn active" title="সুরক্ষা অন/অফ করুন">
+        <button id="masterToggle" class="power-btn active" title="Toggle Protection On/Off">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
             <path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/>
           </svg>
@@ -52,20 +56,20 @@
     <div class="domain-card">
       <div class="domain-row">
         <div class="domain-info">
-          <span class="domain-label">বর্তমান সাইট:</span>
-          <span class="domain-name" id="currentDomain">লোডিং...</span>
+          <span class="domain-label">CURRENT SITE</span>
+          <span class="domain-name" id="currentDomain">Loading...</span>
         </div>
         <div class="status-pill" id="siteStatusPill">
           <span class="dot"></span>
-          <span class="text" id="siteStatusText">সুরক্ষিত</span>
+          <span class="text" id="siteStatusText">Protected</span>
         </div>
       </div>
 
       <!-- Whitelist Toggle -->
       <div class="whitelist-box">
         <div class="whitelist-info">
-          <span class="whitelist-title">এই সাইটে বিজ্ঞাপন চালু রাখুন</span>
-          <span class="whitelist-desc">অনুমোদন করলে বিজ্ঞাপন ব্লক হবে না</span>
+          <span class="whitelist-title">Allow Ads on this site</span>
+          <span class="whitelist-desc">Disable ad blocking for this domain</span>
         </div>
         <label class="switch">
           <input type="checkbox" id="whitelistToggle">
@@ -76,16 +80,16 @@
 
     <!-- Quick Productivity Tools Bar -->
     <div class="tools-bar">
-      <button id="zapperBtn" class="tool-btn zapper-btn" title="পেজের যেকোনো অবাঞ্ছিত অংশ ক্লিক করে মুছে ফেলুন">
+      <button id="zapperBtn" class="tool-btn zapper-btn" title="Click to permanently zap any unwanted element on the page">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="8" x2="12" y2="12"></line>
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
         </svg>
-        🎯 এলিমেন্ট জ্যাপার
+        🎯 Element Zapper
       </button>
 
-      <button id="openWhitelistDrawerBtn" class="tool-btn" title="অনুমোদিত সাইটের তালিকা দেখুন ও ম্যানেজ করুন">
+      <button id="openWhitelistDrawerBtn" class="tool-btn" title="View and manage whitelisted domains">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="8" y1="6" x2="21" y2="6"></line>
           <line x1="8" y1="12" x2="21" y2="12"></line>
@@ -94,7 +98,7 @@
           <line x1="3" y1="12" x2="3.01" y2="12"></line>
           <line x1="3" y1="18" x2="3.01" y2="18"></line>
         </svg>
-        অনুমোদিত তালিকা
+        Whitelist
       </button>
     </div>
 
@@ -110,7 +114,7 @@
         </div>
         <div class="stat-details">
           <span class="stat-value" id="pageCount">0</span>
-          <span class="stat-label">এই পেজে ব্লক</span>
+          <span class="stat-label">Page Blocked</span>
         </div>
       </div>
 
@@ -122,7 +126,7 @@
         </div>
         <div class="stat-details">
           <span class="stat-value" id="totalCount">0</span>
-          <span class="stat-label">মোট ব্লক করা</span>
+          <span class="stat-label">Total Blocked</span>
         </div>
       </div>
 
@@ -135,7 +139,7 @@
         </div>
         <div class="stat-details">
           <span class="stat-value" id="savedData">0 MB</span>
-          <span class="stat-label">সাশ্রয়কৃত ডাটা</span>
+          <span class="stat-label">Data Saved</span>
         </div>
       </div>
 
@@ -148,8 +152,8 @@
           </svg>
         </div>
         <div class="stat-details">
-          <span class="stat-value" id="savedTime">0 মিনিট</span>
-          <span class="stat-label">বাঁচানো সময়</span>
+          <span class="stat-value" id="savedTime">0 min</span>
+          <span class="stat-label">Time Saved</span>
         </div>
       </div>
     </div>
@@ -158,25 +162,25 @@
     <div class="feature-strip">
       <div class="feature-item">
         <span class="feat-dot yt-dot"></span>
-        <span class="feat-text">YouTube Buster</span>
-        <span class="feat-badge">স্বয়ংক্রিয়</span>
+        <span class="feat-text">YouTube Buster v4.0</span>
+        <span class="feat-badge">Auto</span>
       </div>
       <div class="feature-item">
         <span class="feat-dot dnr-dot"></span>
-        <span class="feat-text">DNR Core Engine</span>
-        <span class="feat-badge">সক্রিয়</span>
+        <span class="feat-text">DNR Core (128 Rules)</span>
+        <span class="feat-badge">Active</span>
       </div>
     </div>
 
     <!-- Footer -->
     <footer class="footer">
       <a href="https://itsupport.com.bd" target="_blank" class="footer-tag" style="text-decoration:none;">AmpBlock by IT support BD</a>
-      <button id="reloadBtn" class="reload-btn" title="পরিবর্তন কার্যকর করতে পেজ রিলোড করুন">
+      <button id="reloadBtn" class="reload-btn" title="Reload active page to apply changes">
         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="23 4 23 10 17 10"/>
           <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
         </svg>
-        রিলোড
+        Reload
       </button>
     </footer>
 
@@ -187,15 +191,15 @@
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#00f2fe" stroke-width="2">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
-          অনুমোদিত সাইটের তালিকা
+          Whitelisted Websites
         </div>
-        <button id="closeDrawerBtn" class="drawer-close" title="বন্ধ করুন">✕</button>
+        <button id="closeDrawerBtn" class="drawer-close" title="Close">✕</button>
       </div>
 
       <!-- Add Domain Input -->
       <div class="add-domain-box">
-        <input type="text" id="newDomainInput" placeholder="উদাঃ example.com" />
-        <button id="addDomainBtn" title="যোগ করুন">+</button>
+        <input type="text" id="newDomainInput" placeholder="e.g. example.com" />
+        <button id="addDomainBtn" title="Add Domain">+</button>
       </div>
 
       <!-- Whitelist items container -->

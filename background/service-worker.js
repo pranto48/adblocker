@@ -123,21 +123,21 @@ function setupContextMenus() {
     chrome.contextMenus.create({
       id: 'ampblock_zap',
       parentId: 'ampblock_root',
-      title: '🎯 উপাদান জ্যাপ করুন (Zap Element)',
+      title: '🎯 Zap Element on this Page',
       contexts: ['all']
     });
 
     chrome.contextMenus.create({
       id: 'ampblock_toggle_allow',
       parentId: 'ampblock_root',
-      title: '🛡️ বর্তমান সাইটে বিজ্ঞাপন অনুমোদন/ব্লক করুন',
+      title: '🛡️ Allow / Block Ads on this Site',
       contexts: ['all']
     });
 
     chrome.contextMenus.create({
       id: 'ampblock_settings',
       parentId: 'ampblock_root',
-      title: '⚙️ সেটিংস ড্যাশবোর্ড খুলুন',
+      title: '⚙️ Open Settings Dashboard',
       contexts: ['all']
     });
   });

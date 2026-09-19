@@ -5,7 +5,7 @@
  * # Project: AmpBlock
  * ==============================================================================
  *
- * AmpBlock - Popup Logic
+ * AmpBlock - Popup Logic (English)
  * Real-time stats display, Master Switch, Whitelist Drawer, Element Zapper, and Analytics.
  */
 
@@ -39,10 +39,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   let isCurrentWhitelisted = false;
   let cachedWhitelistedDomains = [];
 
-  // Smooth number animation
+  // Smooth number animation (en-US formatting)
   function animateValue(obj, start, end, duration, formatter) {
     if (start === end) {
-      obj.textContent = formatter ? formatter(end) : end.toLocaleString('bn-BD');
+      obj.textContent = formatter ? formatter(end) : end.toLocaleString('en-US');
       return;
     }
     let startTimestamp = null;
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!startTimestamp) startTimestamp = timestamp;
       const progress = Math.min((timestamp - startTimestamp) / duration, 1);
       const current = Math.floor(progress * (end - start) + start);
-      obj.textContent = formatter ? formatter(current) : current.toLocaleString('bn-BD');
+      obj.textContent = formatter ? formatter(current) : current.toLocaleString('en-US');
       if (progress < 1) {
         window.requestAnimationFrame(step);
       }
@@ -69,9 +69,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Format saved time
   function formatTime(minutes) {
     if (minutes >= 60) {
-      return (minutes / 60).toFixed(1) + ' ঘণ্টা';
+      return (minutes / 60).toFixed(1) + ' hrs';
     }
-    return minutes.toFixed(1) + ' মিনিট';
+    return minutes.toFixed(1) + ' min';
   }
 
   // Get active tab info
@@ -86,12 +86,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           currentDomainEl.textContent = activeDomain;
         } else {
           activeDomain = '';
-          currentDomainEl.textContent = 'অভ্যন্তরীণ পেজ';
+          currentDomainEl.textContent = 'Internal Page';
           whitelistToggle.disabled = true;
           zapperBtn.disabled = true;
         }
       } catch (e) {
-        currentDomainEl.textContent = 'অজানা সাইট';
+        currentDomainEl.textContent = 'Unknown Site';
         whitelistToggle.disabled = true;
         zapperBtn.disabled = true;
       }
@@ -124,31 +124,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (isEnabled) {
       masterToggle.classList.add('active');
       masterToggle.classList.remove('disabled');
-      masterToggle.title = 'সুরক্ষা বন্ধ করতে ক্লিক করুন';
+      masterToggle.title = 'Click to disable protection';
       shieldLogo.style.opacity = '1';
     } else {
       masterToggle.classList.remove('active');
       masterToggle.classList.add('disabled');
-      masterToggle.title = 'সুরক্ষা চালু করতে ক্লিক করুন';
+      masterToggle.title = 'Click to enable protection';
       shieldLogo.style.opacity = '0.4';
     }
 
     // Subtitle & Status
     if (!isEnabled) {
-      statusSubtitle.textContent = 'সুরক্ষা সম্পূর্ণ বন্ধ রয়েছে';
+      statusSubtitle.textContent = 'Protection Disabled';
       statusSubtitle.style.color = '#94a3b8';
       siteStatusPill.className = 'status-pill whitelisted';
-      siteStatusText.textContent = 'নিষ্ক্রিয়';
+      siteStatusText.textContent = 'Disabled';
     } else if (isWhitelisted) {
-      statusSubtitle.textContent = 'বিজ্ঞাপন অনুমোদিত';
+      statusSubtitle.textContent = 'Ads Allowed on this site';
       statusSubtitle.style.color = '#f43f5e';
       siteStatusPill.className = 'status-pill whitelisted';
-      siteStatusText.textContent = 'অনুমোদিত';
+      siteStatusText.textContent = 'Allowed';
     } else {
-      statusSubtitle.textContent = 'সুরক্ষা সক্রিয় রয়েছে';
+      statusSubtitle.textContent = 'Protection Active';
       statusSubtitle.style.color = '#00f2fe';
       siteStatusPill.className = 'status-pill';
-      siteStatusText.textContent = 'সুরক্ষিত';
+      siteStatusText.textContent = 'Protected';
     }
 
     // Whitelist switch
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     whitelistItemsList.innerHTML = '';
 
     if (cachedWhitelistedDomains.length === 0) {
-      whitelistItemsList.innerHTML = '<div class="empty-whitelist">কোনো ওয়েবসাইট অনুমোদিত তালিকায় নেই।</div>';
+      whitelistItemsList.innerHTML = '<div class="empty-whitelist">No websites in the whitelist.</div>';
       return;
     }
 
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const removeBtn = document.createElement('button');
       removeBtn.className = 'remove-domain-btn';
-      removeBtn.title = 'মুছে ফেলুন';
+      removeBtn.title = 'Remove';
       removeBtn.innerHTML = '🗑️';
       removeBtn.addEventListener('click', () => {
         chrome.runtime.sendMessage({ action: 'removeWhitelistDomain', domain: d }, (res) => {
@@ -266,14 +266,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!activeTabId) return;
 
     chrome.tabs.sendMessage(activeTabId, { action: 'triggerZapper' }).catch(() => {
-      // If script not loaded, inject it
       chrome.scripting.executeScript({
         target: { tabId: activeTabId },
         files: ['content/element-zapper.js']
       }).catch(() => {});
     });
 
-    window.close(); // Close popup so user can zap immediately
+    window.close();
   });
 
   // Open Settings Dashboard

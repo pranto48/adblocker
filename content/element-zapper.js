@@ -56,7 +56,7 @@
     z-index: 2147483647 !important;
     display: none !important;
   `;
-  badge.textContent = '🎯 ক্লিক করে জ্যাপ করুন | ESC চেপে বাতিল';
+  badge.textContent = '🎯 Click to Zap | Press ESC to Cancel';
 
   document.body.appendChild(overlay);
   document.body.appendChild(badge);
@@ -107,7 +107,7 @@
     overlay.style.display = 'block';
 
     const selector = getUniqueSelector(target) || target.tagName.toLowerCase();
-    badge.textContent = `🎯 ${selector} | ক্লিক করে জ্যাপ করুন (ESC বাতিল)`;
+    badge.textContent = `🎯 ${selector} | Click to Zap (ESC to Cancel)`;
     badge.style.top = `${Math.max(10, rect.top - 32)}px`;
     badge.style.left = `${Math.max(10, rect.left)}px`;
     badge.style.display = 'block';

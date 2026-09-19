@@ -5,7 +5,7 @@
  * # Project: AmpBlock
  * ==============================================================================
  *
- * AmpBlock - Options Dashboard Logic
+ * AmpBlock - Options Dashboard Logic (English)
  * Manages engine toggles, whitelist domains, custom zapper rules, backup, and restore.
  */
 
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       whitelistTableBody.innerHTML = `
         <tr>
           <td colspan="3" style="text-align:center; color: #64748b; padding: 20px;">
-            কোনো ওয়েবসাইট অনুমোদিত তালিকায় অন্তর্ভুক্ত নেই।
+            No websites currently in the whitelist.
           </td>
         </tr>
       `;
@@ -70,17 +70,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       tdDomain.style.fontWeight = '500';
 
       const tdStatus = document.createElement('td');
-      tdStatus.innerHTML = '<span class="table-badge">অনুমোদিত</span>';
+      tdStatus.innerHTML = '<span class="table-badge">Allowed</span>';
 
       const tdAction = document.createElement('td');
       const delBtn = document.createElement('button');
       delBtn.className = 'delete-btn';
-      delBtn.innerHTML = '🗑️ রিমুভ';
+      delBtn.innerHTML = '🗑️ Remove';
       delBtn.addEventListener('click', () => {
         chrome.runtime.sendMessage({ action: 'removeWhitelistDomain', domain }, (res) => {
           if (res && res.success) {
             renderWhitelistTable(res.whitelistedDomains);
-            showNotification(`'${domain}' তালিকা থেকে রিমুভ করা হয়েছে।`);
+            showNotification(`'${domain}' removed from whitelist.`);
           }
         });
       });
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (domains.length === 0 || domains.every(d => !rulesObj[d] || rulesObj[d].length === 0)) {
       zapperRulesList.innerHTML = `
         <div style="text-align:center; color: #64748b; padding: 15px; font-size: 12px;">
-          এখনো কোনো ওয়েবসাইট থেকে এলিমেন্ট জ্যাপ করা হয়নি। ব্রাউজ করার সময় পপআপ থেকে 'এলিমেন্ট জ্যাপার' ব্যবহার করুন!
+          No custom elements zapped yet. Use the 'Element Zapper' from the extension popup while browsing!
         </div>
       `;
       return;
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const title = document.createElement('div');
       title.className = 'zapper-domain-title';
-      title.textContent = `🌐 ${domain} (${selectors.length}টি রুল)`;
+      title.textContent = `🌐 ${domain} (${selectors.length} rules)`;
 
       const tagList = document.createElement('div');
       tagList.className = 'zapper-tag-list';
@@ -129,13 +129,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const removeSpan = document.createElement('span');
         removeSpan.className = 'tag-remove';
         removeSpan.textContent = '✕';
-        removeSpan.title = 'রুলটি ডিলিট করুন';
+        removeSpan.title = 'Delete Rule';
         removeSpan.addEventListener('click', () => {
           rulesObj[domain] = rulesObj[domain].filter(s => s !== sel);
           if (rulesObj[domain].length === 0) delete rulesObj[domain];
           chrome.storage.local.set({ customBlockedSelectors: rulesObj }, () => {
             renderZapperRules(rulesObj);
-            showNotification(`রুল '${sel}' ডিলিট করা হয়েছে।`);
+            showNotification(`Rule '${sel}' deleted.`);
           });
         });
 
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (res && res.success) {
         whitelistInput.value = '';
         renderWhitelistTable(res.whitelistedDomains);
-        showNotification(`'${domain}' সফলভাবে তালিকায় যুক্ত হয়েছে।`);
+        showNotification(`'${domain}' added to whitelist.`);
       }
     });
   });
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   globalEngineToggle.addEventListener('change', () => {
     chrome.runtime.sendMessage({ action: 'toggleGlobal' }, (res) => {
       if (res) {
-        showNotification(res.isEnabled ? 'সুরক্ষা ইঞ্জিন সক্রিয় করা হয়েছে।' : 'সুরক্ষা ইঞ্জিন নিষ্ক্রিয় করা হয়েছে।');
+        showNotification(res.isEnabled ? 'Protection engine enabled.' : 'Protection engine disabled.');
       }
     });
   });
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
-      showNotification('সেটিংস ব্যাকআপ ফাইল সফলভাবে ডাউনলোড হয়েছে!');
+      showNotification('Settings backup downloaded successfully!');
     });
   });
 
@@ -203,10 +203,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const imported = JSON.parse(event.target.result);
         chrome.storage.local.set(imported, () => {
           loadDashboard();
-          showNotification('সেটিংস সফলভাবে রিস্টোর করা হয়েছে!');
+          showNotification('Settings restored successfully!');
         });
       } catch (err) {
-        showNotification('অকার্যকর ব্যাকআপ ফাইল!', true);
+        showNotification('Invalid backup file!', true);
       }
     };
     reader.readAsText(file);
@@ -214,10 +214,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Reset Stats
   resetStatsBtn.addEventListener('click', () => {
-    if (confirm('আপনি কি নিশ্চিত যে সমস্ত বিজ্ঞাপন ব্লকিং পরিসংখ্যান শূন্য করতে চান?')) {
+    if (confirm('Are you sure you want to reset all ad blocking statistics to zero?')) {
       chrome.runtime.sendMessage({ action: 'resetStats' }, (res) => {
         if (res && res.success) {
-          showNotification('সমস্ত ব্লকিং পরিসংখ্যান রিসেট সম্পন্ন হয়েছে।');
+          showNotification('All statistics have been reset.');
         }
       });
     }

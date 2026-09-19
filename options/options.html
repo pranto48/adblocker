@@ -6,11 +6,11 @@
 ==============================================================================
 -->
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AmpBlock Pro - সেটিংস ও কন্ট্রোল ড্যাশবোর্ড</title>
+  <title>AmpBlock Pro - Settings & Control Dashboard</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
@@ -19,15 +19,19 @@
     <header class="top-nav">
       <div class="brand">
         <div class="shield-logo">
-          <svg viewBox="0 0 256 256" width="36" height="36">
-            <path d="M128 20 C180 20 220 40 220 80 C220 160 160 215 128 236 C96 215 36 160 36 80 C36 40 76 20 128 20 Z" 
-                  fill="#0a192f" stroke="#00f2fe" stroke-width="12"/>
-            <polygon points="135,50 95,130 130,130 115,205 165,115 130,115" fill="#00f2fe"/>
+          <svg viewBox="0 0 512 512" width="38" height="38">
+            <polygon points="256,22 445,86 445,310 256,490 67,310 67,86" fill="#0a192f" stroke="#00f2fe" stroke-width="28" stroke-linejoin="round"/>
+            <polygon points="256,110 198,255 236,255 272,175 256,110" fill="#ffffff"/>
+            <polygon points="198,255 146,396 192,396 232,284 192,284" fill="#00f2fe"/>
+            <polygon points="256,110 314,255 276,255 240,175 256,110" fill="#ffffff"/>
+            <polygon points="314,255 366,396 320,396 280,284 320,284" fill="#00f2fe"/>
+            <rect x="144" y="240" width="224" height="42" rx="8" fill="#00f2fe" stroke="#ffffff" stroke-width="8"/>
+            <polygon points="256,230 274,261 256,292 238,261" fill="#ffffff"/>
           </svg>
         </div>
         <div>
           <h1>AmpBlock Pro <span class="badge">PRO DASHBOARD</span></h1>
-          <p class="subtitle">উন্নত বিজ্ঞাপন নিয়ন্ত্রণ ও কনফিগারেশন প্যানেল</p>
+          <p class="subtitle">Advanced Ad Control & Configuration Panel</p>
         </div>
       </div>
       <div class="nav-links">
@@ -41,14 +45,14 @@
       <!-- Protection Engine Controls -->
       <section class="card">
         <div class="card-header">
-          <h2>🛡️ সুরক্ষা ইঞ্জিন নিয়ন্ত্রণ</h2>
-          <span class="card-desc">কোর ফিল্টারিং মডিউলসমূহ কনফিগার করুন</span>
+          <h2>🛡️ Protection Engine Controls</h2>
+          <span class="card-desc">Configure core ad & tracker filtering modules</span>
         </div>
 
         <div class="setting-row">
           <div class="setting-text">
-            <h3>মূল বিজ্ঞাপন ও ট্র্যাকার ব্লকিং (DNR Engine)</h3>
-            <p>ব্রাউজারের সি++ কোর নেটওয়ার্ক লেভেলে বিজ্ঞাপন ও ট্র্যাকার ব্লক করে।</p>
+            <h3>Core Ad & Tracker Blocking (DNR Engine)</h3>
+            <p>Blocks ads, trackers, and popup redirects natively at the browser's C++ network core.</p>
           </div>
           <label class="switch">
             <input type="checkbox" id="globalEngineToggle" checked>
@@ -58,8 +62,8 @@
 
         <div class="setting-row">
           <div class="setting-text">
-            <h3>ইউটিউব অ্যাড বাস্টার (YouTube Buster v3.2)</h3>
-            <p>১৬ গুণ স্পিড স্কিপ, অটো-মিউট এবং অ্যান্টি-অ্যাডব্লক পপআপ স্বয়ংক্রিয়ভাবে বাইপাস করে।</p>
+            <h3>YouTube Ultra Buster (v4.0)</h3>
+            <p>16x sub-15ms speed-skip, auto-mute, dual-ad sequencer, and anti-adblock modal auto-bypass.</p>
           </div>
           <label class="switch">
             <input type="checkbox" id="youtubeBusterToggle" checked>
@@ -69,8 +73,8 @@
 
         <div class="setting-row">
           <div class="setting-text">
-            <h3>কসমেটিক ফিল্টারিং ও স্পনসরড ফ্রেম রিমুভার</h3>
-            <p>ওয়েব পেজের ফাঁকা সাদা বক্স এবং বিজ্ঞাপন কন্টেইনারগুলো পুরোপুরি লুকিয়ে ফেলে।</p>
+            <h3>Cosmetic Filtering & Space Collapsing</h3>
+            <p>Completely hides empty ad frames, white placeholders, and sponsored widgets.</p>
           </div>
           <label class="switch">
             <input type="checkbox" id="cosmeticFilterToggle" checked>
@@ -82,22 +86,22 @@
       <!-- Whitelisted Domains Manager -->
       <section class="card">
         <div class="card-header">
-          <h2>⚪ অনুমোদিত ওয়েবসাইটসমূহ (Whitelist)</h2>
-          <span class="card-desc">যেসব সাইটে বিজ্ঞাপন প্রদর্শন অনুমোদিত থাকবে</span>
+          <h2>⚪ Whitelisted Websites (Allow Ads)</h2>
+          <span class="card-desc">Websites where advertisements are permitted to display</span>
         </div>
 
         <div class="add-whitelist-form">
-          <input type="text" id="whitelistInput" placeholder="নতুন ডোমেইন লিখুন (যেমন: example.com)" />
-          <button id="addWhitelistBtn" class="primary-btn">যোগ করুন</button>
+          <input type="text" id="whitelistInput" placeholder="Enter domain (e.g. example.com)" />
+          <button id="addWhitelistBtn" class="primary-btn">Add Domain</button>
         </div>
 
         <div class="whitelist-table-wrapper">
           <table class="data-table">
             <thead>
               <tr>
-                <th>ডোমেইন নাম</th>
-                <th>স্ট্যাটাস</th>
-                <th>অ্যাকশন</th>
+                <th>Domain Name</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="whitelistTableBody">
@@ -110,8 +114,8 @@
       <!-- Custom Blocked Elements (Zapper Rules) -->
       <section class="card full-width">
         <div class="card-header">
-          <h2>🎯 ব্যবহারকারী নির্ধারিত জ্যাপার রুলস (Custom Zapped Rules)</h2>
-          <span class="card-desc">এলিমেন্ট জ্যাপার ব্যবহার করে পেজ থেকে যেসকল উপাদান মুছে ফেলা হয়েছে</span>
+          <h2>🎯 Custom Zapper Rules (User Filters)</h2>
+          <span class="card-desc">Specific elements permanently removed from web pages using the Element Zapper</span>
         </div>
 
         <div class="zapper-rules-container" id="zapperRulesList">
@@ -122,22 +126,22 @@
       <!-- Backup, Restore & Analytics -->
       <section class="card full-width">
         <div class="card-header">
-          <h2>💾 ডাটা ম্যানেজমেন্ট ও ব্যাকআপ</h2>
-          <span class="card-desc">আপনার সেটিংস এক্সপোর্ট করুন বা পরিসংখ্যান রিসেট করুন</span>
+          <h2>💾 Data Management & Backup</h2>
+          <span class="card-desc">Export your settings as JSON, restore backups, or reset blocking statistics</span>
         </div>
 
         <div class="action-buttons-row">
           <button id="exportSettingsBtn" class="action-btn">
-            📥 সেটিংস ব্যাকআপ ডাউনলোড (JSON)
+            📥 Download Settings Backup (JSON)
           </button>
           
           <label class="action-btn file-label">
-            📤 ব্যাকআপ রিস্টোর করুন
+            📤 Restore Backup File
             <input type="file" id="importSettingsInput" accept=".json" style="display:none;" />
           </label>
 
           <button id="resetStatsBtn" class="action-btn danger">
-            🔄 বিজ্ঞাপন ব্লকিং পরিসংখ্যান রিসেট
+            🔄 Reset Blocking Statistics
           </button>
         </div>
         <div id="statusNotification" class="notification"></div>
