@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AmpBlock Features — Advanced Ad Defuser, YouTube Buster & Popunder Shield</title>
+  <meta name="description" content="Explore AmpBlock's cutting-edge technologies: YouTube Ultra Buster v4.0, Torrent Popunder Defeater, 128 DNR Rules, Element Zapper, and Zero-Space Collapse.">
+  <link rel="icon" type="image/svg+xml" href="assets/shield.svg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo-group">
+        <img src="assets/shield.svg" alt="AmpBlock Logo" class="brand-logo" width="38" height="38">
+        <span class="brand-name">Amp<span class="highlight">Block</span></span>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="features.html" class="nav-link active">Features</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="download.html" class="nav-cta-btn">Download Free</a>
+      </nav>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">&#9776;</button>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <div class="container">
+      <!-- Feature Header -->
+      <div class="page-header">
+        <span class="page-eyebrow">TECHNOLOGY STACK</span>
+        <h1 class="page-title">Defensive Engineering Built for the Modern Web</h1>
+        <p class="page-lead">
+          While legacy extensions struggle with Manifest V3 restrictions, AmpBlock was designed natively around Chrome's newest declarative engine paired with main-world DOM sandboxing.
+        </p>
+      </div>
+
+      <!-- Feature 1: YouTube Buster -->
+      <section class="feature-deep-dive" id="youtube">
+        <div class="feature-text">
+          <div class="feature-pill">VIDEO OPTIMIZATION</div>
+          <h2>YouTube Ultra Buster v4.0</h2>
+          <p class="feature-description">
+            YouTube frequently updates its video player to inject anti-adblock modals, black screen delays, and unskippable double-ad chains.
+          </p>
+          <ul class="feature-checklist">
+            <li><strong>Sub-15ms Speedup & Auto-Skip:</strong> Instantly detects playing ad elements and fast-forwards them at 16x speed while auto-clicking the "Skip Ad" button.</li>
+            <li><strong>Instant Audio Mute:</strong> Automatically silences the video player for the micro-second an ad tries to play, ensuring you never hear jarring promotional audio.</li>
+            <li><strong>Anti-Adblock Modal Neutralizer:</strong> Detects and neutralizes YouTube's "Ad blockers violate YouTube's Terms of Service" popup dialogues instantly, restoring regular playback.</li>
+          </ul>
+        </div>
+        <div class="feature-media">
+          <div class="tech-card">
+            <div class="tech-header">
+              <span class="tech-badge">CORE LOGIC</span>
+              <span>content/youtube-buster.js</span>
+            </div>
+            <pre class="tech-code"><code>// Auto-skip sequencer
+if (adContainer.length > 0) {
+  videoPlayer.muted = true;
+  videoPlayer.playbackRate = 16.0;
+  videoPlayer.currentTime = 
+    videoPlayer.duration || 9999;
+  skipButton?.click();
+}</code></pre>
+            <div class="tech-status">
+              <span class="status-indicator"></span> Active & Operational
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature 2: Torrent & Popunder Defeater -->
+      <section class="feature-deep-dive reverse" id="popunder">
+        <div class="feature-text">
+          <div class="feature-pill">ANTI-MALWARE & POPUPS</div>
+          <h2>Torrent & Streaming Popunder Defeater</h2>
+          <p class="feature-description">
+            High-risk sites like <code>limetorrents.fun</code>, free movie streaming sites, and anime portals use malicious JavaScript patterns that intercept genuine user clicks to spawn new background ad tabs.
+          </p>
+          <ul class="feature-checklist">
+            <li><strong>Window.open Sandboxing:</strong> Intercepts window generation in the document's main JavaScript context. Any unrequested popup attempt is defused before a tab opens.</li>
+            <li><strong>Full-Page Overlay Cleaner:</strong> Cleanses invisible transparent full-screen <code>&lt;div&gt;</code> overlays designed to hijack your first click anywhere on the page.</li>
+            <li><strong>Programmatic Anchor Click Guard:</strong> Prevents fake hidden <code>&lt;a target="_blank"&gt;</code> elements created dynamically by scripts from firing unauthorized navigation.</li>
+          </ul>
+        </div>
+        <div class="feature-media">
+          <div class="tech-card">
+            <div class="tech-header">
+              <span class="tech-badge">MAIN WORLD DEFENSE</span>
+              <span>content/popup-blocker.js</span>
+            </div>
+            <pre class="tech-code"><code>// Window open interceptor
+const originalOpen = window.open;
+window.open = function(url, target, features) {
+  if (isSuspiciousAdPattern(url)) {
+    console.warn('[AmpBlock] Blocked Popunder:', url);
+    return null; // Silent neutralizer
+  }
+  return originalOpen.apply(this, arguments);
+};</code></pre>
+            <div class="tech-status">
+              <span class="status-indicator"></span> Click-Trap Defeater Armed
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature 3: Declarative Net Request Rules -->
+      <section class="feature-deep-dive" id="dnr">
+        <div class="feature-text">
+          <div class="feature-pill">ZERO-CPU ENGINE</div>
+          <h2>128+ Declarative Net Request (DNR) Rules</h2>
+          <p class="feature-description">
+            Unlike legacy ad blockers that examine every HTTP request using CPU-heavy JavaScript background listeners, AmpBlock delegates blocking to the browser's native C++ engine.
+          </p>
+          <ul class="feature-checklist">
+            <li><strong>Zero Memory Leaks:</strong> Manifest V3 declarative rules execute entirely in the browser kernel without waking up the extension service worker.</li>
+            <li><strong>Main-Frame Torrent Protection:</strong> Specific rule sets explicitly reject navigation to known malicious popunder redirect networks, even if a new tab were triggered.</li>
+            <li><strong>Tracker Neutralization:</strong> Blocks Google Analytics, DoubleClick, Facebook Pixel, Taboola, Outbrain, Criteo, and 120+ ad telemetries before DNS resolution.</li>
+          </ul>
+        </div>
+        <div class="feature-media">
+          <div class="tech-card">
+            <div class="tech-header">
+              <span class="tech-badge">MANIFEST V3 KERNEL</span>
+              <span>rules/rules.json</span>
+            </div>
+            <pre class="tech-code"><code>{
+  "id": 105,
+  "priority": 1,
+  "action": { "type": "block" },
+  "condition": {
+    "urlFilter": "*adsterra*",
+    "resourceTypes": ["main_frame", "sub_frame", "script", "xmlhttprequest"]
+  }
+}</code></pre>
+            <div class="tech-status">
+              <span class="status-indicator"></span> 128 Kernel Rules Loaded
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature 4: Element Zapper & Ad Defuser -->
+      <section class="feature-deep-dive reverse" id="zapper">
+        <div class="feature-text">
+          <div class="feature-pill">PRECISION TOOLS</div>
+          <h2>Visual Element Zapper & Anti-Adblock Defuser</h2>
+          <p class="feature-description">
+            Take complete control of what appears on your screen with our point-and-click surgical tool, plus automated anti-adblock mock globals.
+          </p>
+          <ul class="feature-checklist">
+            <li><strong>HUD Target Framing:</strong> Hover over any annoying floating bar, sticky chat widget, or paywall prompt. A cyber-blue HUD highlights the element precisely.</li>
+            <li><strong>Permanent Elimination:</strong> Click once and the element is excised from the page DOM instantly without reloading.</li>
+            <li><strong>Mock Global Injection:</strong> Emulates safe ad network variables (such as <code>adsbygoogle = []</code> and <code>canRunAds = true</code>) so news websites never know you're blocking ads.</li>
+          </ul>
+        </div>
+        <div class="feature-media">
+          <div class="tech-card">
+            <div class="tech-header">
+              <span class="tech-badge">SURGICAL TOOL</span>
+              <span>content/element-zapper.js</span>
+            </div>
+            <pre class="tech-code"><code>// Cyber HUD targeting
+target.style.outline = 
+  '2px solid #00e5ff';
+target.style.backgroundColor = 
+  'rgba(0, 229, 255, 0.15)';
+// Click to Zap:
+target.remove();</code></pre>
+            <div class="tech-status">
+              <span class="status-indicator"></span> Ready on Demand via Popup
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Callout -->
+      <div class="bottom-cta">
+        <div class="cta-container">
+          <div class="cta-text">
+            <h2>Experience Clean Web Browsing</h2>
+            <p>Download AmpBlock Pro now and enjoy true speed and privacy.</p>
+          </div>
+          <div class="cta-button-wrap">
+            <a href="download.html" class="btn btn-primary btn-large">Get AmpBlock Pro v1.3.1</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="logo-group">
+          <img src="assets/shield.svg" alt="AmpBlock Shield" width="28" height="28">
+          <span class="brand-name">Amp<span class="highlight">Block</span></span>
+        </div>
+        <p class="footer-desc">The ultimate open Manifest V3 ad-blocking engine for modern web navigation.</p>
+        <p class="copyright-notice">
+          Copyright &copy; 2026 <a href="https://itsupport.com.bd" target="_blank" rel="noopener">IT support BD</a>.<br>
+          Architected & Engineered by <a href="https://arifmahmud.com/" target="_blank" rel="noopener">Arif Mahmud</a>.
+        </p>
+      </div>
+
+      <div class="footer-links-group">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="features.html">Features</a></li>
+          <li><a href="about.html">About & Privacy</a></li>
+          <li><a href="download.html">Install Guide</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-group">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="https://itsupport.com.bd" target="_blank" rel="noopener">IT Support BD</a></li>
+          <li><a href="https://arifmahmud.com/" target="_blank" rel="noopener">Author Profile</a></li>
+          <li><a href="download.html">Download Archive</a></li>
+          <li><a href="features.html#youtube">YouTube Buster</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

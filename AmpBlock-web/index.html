@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AmpBlock Pro — Next-Gen Cyber Shield Ad Blocker</title>
+  <meta name="description" content="AmpBlock Pro is the fastest, ultra-efficient Manifest V3 ad blocker for YouTube, video ads, torrent popunders, and trackers. Zero lag, maximum privacy.">
+  <link rel="icon" type="image/svg+xml" href="assets/shield.svg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="index.html" class="logo-group">
+        <img src="assets/shield.svg" alt="AmpBlock Logo" class="brand-logo" width="38" height="38">
+        <span class="brand-name">Amp<span class="highlight">Block</span></span>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="features.html" class="nav-link">Features</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="download.html" class="nav-cta-btn">Download Free</a>
+      </nav>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">&#9776;</button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero-section">
+      <div class="hero-glow"></div>
+      <div class="container hero-content">
+        <div class="hero-badge">
+          <span class="pulse-dot"></span>
+          <span>Manifest V3 Powered • v1.3.1 Cyber Shield</span>
+        </div>
+        <h1 class="hero-title">
+          Surf Pure Web Without <span class="gradient-text">Ads, Popups,</span> or Lag.
+        </h1>
+        <p class="hero-subtitle">
+          Engineered for extreme performance. AmpBlock obliterates YouTube video ads, neutralizes torrent site click-traps, eliminates banners, and stops trackers with zero CPU overhead.
+        </p>
+
+        <div class="hero-actions">
+          <a href="download.html" class="btn btn-primary" id="primaryInstallBtn">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+            <span class="btn-label">Get AmpBlock for Chrome</span>
+          </a>
+          <a href="#simulator" class="btn btn-secondary">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <span>Live Interactive Demo</span>
+          </a>
+        </div>
+        <p class="browser-notice" id="browserNotice">Compatible with Chrome, Microsoft Edge, Brave, Opera & Vivaldi.</p>
+
+        <!-- Stats Bar -->
+        <div class="stats-ribbon">
+          <div class="stat-card">
+            <span class="stat-number" id="counterBlocked">4,872,954</span>
+            <span class="stat-label">Ads & Popups Blocked</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="counterTime">3.8x</span>
+            <span class="stat-label">Faster Page Loading</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="counterBandwidth">64%</span>
+            <span class="stat-label">Bandwidth Saved</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Zero-Log Local Privacy</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Simulator Section -->
+    <section class="simulator-section" id="simulator">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Experience the Difference in Real-Time</h2>
+          <p class="section-desc">Toggle the switch below to witness how AmpBlock instantly cleanses cluttered, ad-choked web pages.</p>
+          
+          <div class="sim-switch-wrapper">
+            <span class="sim-toggle-label">Cluttered Web</span>
+            <label class="switch">
+              <input type="checkbox" id="simToggle" checked>
+              <span class="slider round"></span>
+            </label>
+            <span class="sim-toggle-label active">AmpBlock Protected</span>
+          </div>
+          <div id="simStatusBadge" class="sim-status-badge protected">AMPBLOCK ACTIVE: 0 ADS & POPUPS</div>
+        </div>
+
+        <!-- Simulated Browser Frame -->
+        <div class="browser-mockup" id="simViewport">
+          <div class="browser-topbar">
+            <div class="traffic-lights">
+              <span class="light red"></span>
+              <span class="light yellow"></span>
+              <span class="light green"></span>
+            </div>
+            <div class="address-bar">
+              <span class="padlock">&#128274;</span>
+              <span class="url">https://streaming-video-demo.example/watch?v=ampblock</span>
+            </div>
+          </div>
+
+          <div class="sim-webpage-content">
+            <!-- Simulated Main Article/Video -->
+            <div class="sim-main">
+              <!-- Top Banner Ad (hidden when protected) -->
+              <div class="sim-ad-slot top-banner">
+                <span class="ad-tag">SPONSORED AD</span>
+                <p>⚡ "You Won $1,000,000! Click here immediately to claim!" ⚡</p>
+              </div>
+
+              <div class="sim-video-player">
+                <div class="video-overlay">
+                  <div class="play-btn">&#9658;</div>
+                  <span>4K Crystal Clean Stream — Ad Defused in 12ms</span>
+                </div>
+                <!-- YouTube Overlay Ad (hidden when protected) -->
+                <div class="sim-ad-slot video-ad-overlay">
+                  <span class="ad-tag">VIDEO AD: 30s UNSKIPPABLE</span>
+                  <p>Invest in crypto right now!</p>
+                </div>
+              </div>
+
+              <div class="sim-text-content">
+                <h3>Next-Gen Fast Streaming & Clean Typography</h3>
+                <p>When you browse with AmpBlock, ad code never even reaches your renderer. Network requests are deflected natively at the browser kernel level using Manifest V3 declarative rules.</p>
+              </div>
+            </div>
+
+            <!-- Simulated Sidebar -->
+            <div class="sim-sidebar">
+              <div class="sim-ad-slot sidebar-ad-1">
+                <span class="ad-tag">FLASHING AD</span>
+                <p>⚠️ Flash Player Outdated! Download Now</p>
+              </div>
+              <div class="sim-ad-slot sidebar-ad-2">
+                <span class="ad-tag">POPUP TRAP</span>
+                <p>Casino Free Spins 777</p>
+              </div>
+              <div class="sim-widget">
+                <h4>Up Next</h4>
+                <div class="up-next-item">Clean Video Queue 1</div>
+                <div class="up-next-item">Clean Video Queue 2</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Pillars / Why AmpBlock -->
+    <section class="pillars-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Built Different. Engineered for Speed.</h2>
+          <p class="section-desc">Why millions of users choose modern Manifest V3 defense over legacy, sluggish blockers.</p>
+        </div>
+
+        <div class="grid-3">
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="#00e5ff"><path d="M21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86-.23 1.54-.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3-5.2 3z"/></svg>
+            </div>
+            <h3>YouTube Ultra Buster v4.0</h3>
+            <p>Bypasses pre-roll, mid-roll, and sidebar ads seamlessly in sub-15ms without black screens or anti-adblock warning modals.</p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="#00e5ff"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1z"/></svg>
+            </div>
+            <h3>Torrent & Popunder Defeater</h3>
+            <p>Neutralizes deceptive background tabs, invisible overlay traps, and programmatic click hijacks on torrent and streaming sites like LimeTorrents.</p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="#00e5ff"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+            </div>
+            <h3>128+ Kernel DNR Rules</h3>
+            <p>Utilizes Chromium's Declarative Net Request engine to drop ad connections at zero CPU overhead before they ever download.</p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="#00e5ff"><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"/></svg>
+            </div>
+            <h3>Visual Element Zapper</h3>
+            <p>Click any annoying floating banner, newsletter box, or cookie banner to permanently zap it out of existence on that page.</p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="#00e5ff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </div>
+            <h3>Zero-Space Ad Collapse</h3>
+            <p>No ugly empty white spaces or broken grey placeholders. Our CSS cosmetic engine collapses ad containers down to zero pixels.</p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-icon">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="#00e5ff"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            </div>
+            <h3>100% Client-Side Privacy</h3>
+            <p>No telemetry, no remote ad-selling deals, and no tracking databases. Your browsing habits never leave your local browser storage.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Browser Support Strip -->
+    <section class="browsers-strip">
+      <div class="container">
+        <h3 class="browsers-title">Seamlessly Supports All Major Chromium Browsers</h3>
+        <div class="browser-logos">
+          <div class="browser-badge">Google Chrome</div>
+          <div class="browser-badge">Microsoft Edge</div>
+          <div class="browser-badge">Brave Browser</div>
+          <div class="browser-badge">Opera / Opera GX</div>
+          <div class="browser-badge">Vivaldi</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom CTA Banner -->
+    <section class="bottom-cta">
+      <div class="container cta-container">
+        <div class="cta-text">
+          <h2>Ready for an Ad-Free, Light-Speed Web?</h2>
+          <p>Download AmpBlock Pro free today. Install in less than 60 seconds.</p>
+        </div>
+        <div class="cta-button-wrap">
+          <a href="download.html" class="btn btn-primary btn-large">
+            Download AmpBlock Pro v1.3.1 (.ZIP)
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="logo-group">
+          <img src="assets/shield.svg" alt="AmpBlock Shield" width="28" height="28">
+          <span class="brand-name">Amp<span class="highlight">Block</span></span>
+        </div>
+        <p class="footer-desc">The ultimate open Manifest V3 ad-blocking engine for modern web navigation.</p>
+        <p class="copyright-notice">
+          Copyright &copy; 2026 <a href="https://itsupport.com.bd" target="_blank" rel="noopener">IT support BD</a>.<br>
+          Architected & Engineered by <a href="https://arifmahmud.com/" target="_blank" rel="noopener">Arif Mahmud</a>.
+        </p>
+      </div>
+
+      <div class="footer-links-group">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="features.html">Features</a></li>
+          <li><a href="about.html">About & Privacy</a></li>
+          <li><a href="download.html">Install Guide</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-group">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="https://itsupport.com.bd" target="_blank" rel="noopener">IT Support BD</a></li>
+          <li><a href="https://arifmahmud.com/" target="_blank" rel="noopener">Author Profile</a></li>
+          <li><a href="download.html">Download Archive</a></li>
+          <li><a href="features.html#youtube">YouTube Buster</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

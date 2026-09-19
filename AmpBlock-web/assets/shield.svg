@@ -1,0 +1,69 @@
+<!--
+==============================================================================
+# Copyright (c) 2026 IT support BD (https://itsupport.com.bd)
+# Made By Arif (https://arifmahmud.com/)
+# Project: AmpBlock
+==============================================================================
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="shieldBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070e1e"/>
+      <stop offset="50%" stop-color="#0b172e"/>
+      <stop offset="100%" stop-color="#040813"/>
+    </linearGradient>
+
+    <linearGradient id="neonBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#4facfe"/>
+    </linearGradient>
+
+    <linearGradient id="blockBarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f2fe"/>
+      <stop offset="100%" stop-color="#00c6ff"/>
+    </linearGradient>
+
+    <filter id="cyberGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Hexagonal Cyber Block Shield -->
+  <polygon points="256,22 445,86 445,310 256,490 67,310 67,86" 
+           fill="url(#shieldBg)" 
+           stroke="url(#neonBorder)" 
+           stroke-width="16" 
+           stroke-linejoin="round"
+           filter="url(#cyberGlow)"/>
+
+  <!-- Inner Architectural Facet Line -->
+  <polygon points="256,52 418,106 418,296 256,450 94,296 94,106" 
+           fill="none" 
+           stroke="rgba(0, 242, 254, 0.22)" 
+           stroke-width="4" 
+           stroke-linejoin="round"/>
+
+  <!-- Stylized "A" Block Emblem -->
+  <!-- Left Leg -->
+  <polygon points="256,110 198,255 236,255 272,175 256,110" fill="#ffffff"/>
+  <polygon points="198,255 146,396 192,396 232,284 192,284" fill="url(#blockBarGrad)"/>
+  
+  <!-- Right Leg -->
+  <polygon points="256,110 314,255 276,255 240,175 256,110" fill="#ffffff"/>
+  <polygon points="314,255 366,396 320,396 280,284 320,284" fill="url(#blockBarGrad)"/>
+
+  <!-- Solid Indestructible BLOCK Barrier Bar -->
+  <rect x="144" y="240" width="224" height="42" rx="6" 
+        fill="url(#blockBarGrad)" 
+        stroke="#ffffff" 
+        stroke-width="4" 
+        filter="url(#cyberGlow)"/>
+
+  <!-- Center Prismatic Energy Core -->
+  <polygon points="256,230 274,261 256,292 238,261" fill="#ffffff"/>
+</svg>
