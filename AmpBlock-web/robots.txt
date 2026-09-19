@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ampblock.itsupport.com.bd/sitemap.xml
+Host: ampblock.itsupport.com.bd
