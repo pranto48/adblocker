@@ -5,8 +5,9 @@
  * # Project: AmpBlock
  * ==============================================================================
  *
- * AmpBlock - Anti-Adblock Defuser & Scriptlet Mock Engine
- * Injects safe mock ad globals at document_start to deceive anti-adblock detection scripts.
+ * AmpBlock - Anti-Adblock Defuser & Scriptlet Mock Engine v2.0
+ * Injects safe mock ad globals at document_start to deceive Google Ads, Bing Ads,
+ * and anti-adblock detection scripts.
  */
 
 (function () {
@@ -18,13 +19,17 @@
   // Code to run inside page's main context
   const defuserPayload = `
     try {
+      // 1. Universal Ad Run Status
       window.canRunAds = true;
       window.isAdBlockActive = false;
       window.adBlockDetected = false;
+      window.__adblock_detected = false;
+
+      // 2. Google AdSense & Ad Manager Mocks
       window.google_ad_client = 'ca-pub-9999999999999999';
       window.google_ad_slot = '9999999999';
+      window.google_ad_status = 1;
 
-      // Mock adsbygoogle array
       if (!window.adsbygoogle) {
         window.adsbygoogle = [];
       }
@@ -37,7 +42,17 @@
         return 1;
       };
 
-      // Mock FuckAdBlock / BlockAdBlock
+      // 3. Bing / Microsoft Ads UET Tracker Mock
+      if (!window.uetq) {
+        window.uetq = [];
+      }
+      window.uetq.push = function() { return 1; };
+
+      // 4. Taboola & Outbrain Mocks
+      if (!window._taboola) window._taboola = [];
+      window._taboola.push = function() { return 1; };
+
+      // 5. Anti-Adblock Detection Frameworks Mock (FuckAdBlock, BlockAdBlock, etc.)
       window.fuckAdBlock = {
         check: function() { return false; },
         on: function(isAdblock, callback) {
@@ -51,10 +66,11 @@
         }
       };
       window.blockAdBlock = window.fuckAdBlock;
+      window.SnackAdBlock = window.fuckAdBlock;
     } catch(e) {}
   `;
 
-  // Inject into DOM
+  // Inject into DOM in MAIN world
   const script = document.createElement('script');
   script.textContent = defuserPayload;
   (document.head || document.documentElement).appendChild(script);
