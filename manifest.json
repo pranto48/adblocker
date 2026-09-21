@@ -54,7 +54,8 @@
       ],
       "js": [
         "content/ad-defuser.js",
-        "content/popup-blocker.js"
+        "content/popup-blocker.js",
+        "content/security-sentinel.js"
       ],
       "run_at": "document_start",
       "world": "MAIN"
@@ -64,7 +65,8 @@
         "<all_urls>"
       ],
       "css": [
-        "content/cosmetic-filter.css"
+        "content/cosmetic-filter.css",
+        "content/quarantine-shield.css"
       ],
       "js": [
         "content/content-script.js"
@@ -84,7 +86,9 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "content/element-zapper.js"
+        "content/element-zapper.js",
+        "content/security-sentinel.js",
+        "content/quarantine-shield.css"
       ],
       "matches": [
         "<all_urls>"

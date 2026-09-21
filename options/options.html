@@ -111,6 +111,57 @@
         </div>
       </section>
 
+      <!-- DevOps Behavioral Security Sentinel Controls -->
+      <section class="card">
+        <div class="card-header">
+          <h2>⚡ DevOps Behavioral Security Sentinel</h2>
+          <span class="card-desc">জিরো-ট্রাস্ট ওয়েবসাইট ক্ষতিকারক আচরণ সনাক্তকরণ ও কোয়ারেন্টাইন ইঞ্জিন</span>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-text">
+            <h3>Autonomous Zero-Trust Guard</h3>
+            <p>ওয়েবসাইটের কোড আচরণ রিয়েল-টাইমে পর্যবেক্ষণ করে ক্ষতিকারক ট্র্যাপ পেলে সাইট ব্লক করবে।</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="sentinelMasterToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-text">
+            <h3>⛏️ Cryptomining & High-CPU Worker Shield</h3>
+            <p>Coinhive, Stratum WebSocket ও ব্যাকগ্রাউন্ড মাইনার প্রোটোকল স্বয়ংক্রিয়ভাবে প্রতিরোধ।</p>
+          </div>
+          <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4);">ACTIVE</span>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-text">
+            <h3>↩️ Navigation Lockout & Back-Button Trap Defuser</h3>
+            <p>অস্বাভাবিক history.pushState ফ্লাডিং প্রতিরোধ করে ব্রাউজারে আটকে থাকা রোধ করে।</p>
+          </div>
+          <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4);">ACTIVE</span>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-text">
+            <h3>📋 Clipboard Malicious Payload Blocker</h3>
+            <p>ভুয়া রোবট ভেরিফিকেশনের মাধ্যমে ক্লিপবোর্ডে PowerShell বা shell স্ক্রিপ্ট ইনজেকশন ব্লক।</p>
+          </div>
+          <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4);">ACTIVE</span>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-text">
+            <h3>🪟 Viewport Clickjacking Invisible Overlay Killer</h3>
+            <p>ইউজারকে না জানিয়ে ক্লিক চুরির জন্য লুকানো ফুল-স্ক্রিন স্বচ্ছ ওভারলে অপসারণ।</p>
+          </div>
+          <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4);">ACTIVE</span>
+        </div>
+      </section>
+
       <!-- Custom Blocked Elements (Zapper Rules) -->
       <section class="card full-width">
         <div class="card-header">
@@ -120,6 +171,37 @@
 
         <div class="zapper-rules-container" id="zapperRulesList">
           <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- DevOps Incident Telemetry & Audit Log -->
+      <section class="card full-width">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2>📋 DevOps Incident Telemetry & Threat Audit Log</h2>
+            <span class="card-desc">ক্ষতিকারক বা অস্বাভাবিক আচরণের জন্য ব্লক হওয়া ওয়েবসাইটের রিয়েল-টাইম ফরেনসিক রেকর্ড</span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button id="exportThreatsBtn" class="primary-btn" style="padding: 6px 12px; font-size: 12px;">📥 Export Threat Log (JSON)</button>
+            <button id="clearThreatsBtn" class="action-btn danger" style="padding: 6px 12px; font-size: 12px;">🗑️ Clear Incidents</button>
+          </div>
+        </div>
+
+        <div class="whitelist-table-wrapper" style="margin-top: 14px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Time (UTC)</th>
+                <th>Target Domain</th>
+                <th>Threat Score</th>
+                <th>Detected Vectors</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="threatsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
         </div>
       </section>
 

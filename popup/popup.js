@@ -33,6 +33,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const newDomainInput = document.getElementById('newDomainInput');
   const addDomainBtn = document.getElementById('addDomainBtn');
 
+  // iOS 27 Sentinel Elements
+  const sentinelStatusRing = document.getElementById('sentinelStatusRing');
+  const sentinelStatusPill = document.getElementById('sentinelStatusPill');
+  const sentinelStateDesc = document.getElementById('sentinelStateDesc');
+  const sentinelScoreNum = document.getElementById('sentinelScoreNum');
+  const sentinelBarFill = document.getElementById('sentinelBarFill');
+  const threatsBlockedVal = document.getElementById('threatsBlockedVal');
+  const testQuarantineBtn = document.getElementById('testQuarantineBtn');
+
   let activeTabId = null;
   let activeDomain = '';
   let isGlobalEnabled = true;
@@ -169,6 +178,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     const minSaved = totalBlocked * 0.05;
     savedDataEl.textContent = formatData(mbSaved);
     savedTimeEl.textContent = formatTime(minSaved);
+
+    // Update iOS 27 DevOps Sentinel State
+    const threatScore = Number(data.threatScore) || 0;
+    const isQuarantined = Boolean(data.isQuarantined);
+    const threatsTotal = Number(data.threatsBlockedTotal) || 0;
+
+    if (threatsBlockedVal) {
+      threatsBlockedVal.textContent = threatsTotal.toLocaleString('en-US');
+    }
+
+    if (sentinelScoreNum) {
+      sentinelScoreNum.textContent = threatScore;
+    }
+
+    if (sentinelBarFill) {
+      sentinelBarFill.style.width = Math.min(100, Math.max(0, threatScore)) + '%';
+    }
+
+    if (isQuarantined || threatScore >= 50) {
+      if (sentinelStatusRing) sentinelStatusRing.className = 'sentinel-status-ring danger';
+      if (sentinelStatusPill) {
+        sentinelStatusPill.className = 'sentinel-pill danger';
+        sentinelStatusPill.textContent = 'BLOCKED';
+      }
+      if (sentinelScoreNum) sentinelScoreNum.className = 'sentinel-score-num danger';
+      if (sentinelBarFill) sentinelBarFill.className = 'sentinel-bar-fill danger';
+      if (sentinelStateDesc) sentinelStateDesc.textContent = 'ক্ষতিকারক আচরণের কারণে সাইটটি কোয়ারেন্টাইন করা হয়েছে';
+    } else if (threatScore > 0) {
+      if (sentinelStatusRing) sentinelStatusRing.className = 'sentinel-status-ring warn';
+      if (sentinelStatusPill) {
+        sentinelStatusPill.className = 'sentinel-pill warn';
+        sentinelStatusPill.textContent = 'WARNING';
+      }
+      if (sentinelScoreNum) sentinelScoreNum.className = 'sentinel-score-num warn';
+      if (sentinelBarFill) sentinelBarFill.className = 'sentinel-bar-fill warn';
+      if (sentinelStateDesc) sentinelStateDesc.textContent = 'সন্দেহজনক আচরণ নিরীক্ষণ করা হচ্ছে';
+    } else {
+      if (sentinelStatusRing) sentinelStatusRing.className = 'sentinel-status-ring safe';
+      if (sentinelStatusPill) {
+        sentinelStatusPill.className = 'sentinel-pill safe';
+        sentinelStatusPill.textContent = 'CLEAN';
+      }
+      if (sentinelScoreNum) sentinelScoreNum.className = 'sentinel-score-num';
+      if (sentinelBarFill) sentinelBarFill.className = 'sentinel-bar-fill safe';
+      if (sentinelStateDesc) sentinelStateDesc.textContent = 'সাইটের আচরণ সম্পূর্ণ নিরাপদ ও পর্যবেক্ষণাধীন';
+    }
   }
 
   // Render Whitelist Drawer
@@ -287,6 +342,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       window.close();
     }
   });
+
+  // Test Sentinel Shield Button Click
+  if (testQuarantineBtn) {
+    testQuarantineBtn.addEventListener('click', () => {
+      if (!activeTabId) return;
+      chrome.tabs.sendMessage(activeTabId, { action: 'forceQuarantine' }, (res) => {
+        if (chrome.runtime.lastError) {
+          alert('এই পেজে সিকিউরিটি সেন্টিনেল রান করা সম্ভব নয় (Internal Chrome পেজ বা এক্সটেনশন স্ক্রিপ্ট নিষিদ্ধ)। সাধারণ কোনো ওয়েবসাইট পেজে টেস্ট করুন।');
+        } else {
+          window.close();
+        }
+      });
+    });
+  }
 
   // Initial load
   refreshState();

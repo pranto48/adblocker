@@ -9,8 +9,9 @@
  * Controls DNR rules, popup tab auto-closer, domain whitelist, tab badges, and context menus.
  */
 
-// In-memory tab counts
+// In-memory tab counts & threat states
 const tabStats = new Map();
+const tabThreats = new Map();
 
 // Helper: Normalize domain name
 function extractHostname(url) {
@@ -59,7 +60,10 @@ chrome.runtime.onInstalled.addListener(async () => {
     'isEnabled',
     'whitelistedDomains',
     'totalBlocked',
-    'customBlockedSelectors'
+    'customBlockedSelectors',
+    'sentinelEnabled',
+    'threatIncidents',
+    'threatsBlockedTotal'
   ]);
 
   if (typeof data.isEnabled === 'undefined') {
@@ -73,6 +77,15 @@ chrome.runtime.onInstalled.addListener(async () => {
   }
   if (!data.customBlockedSelectors) {
     await chrome.storage.local.set({ customBlockedSelectors: {} });
+  }
+  if (typeof data.sentinelEnabled === 'undefined') {
+    await chrome.storage.local.set({ sentinelEnabled: true });
+  }
+  if (!Array.isArray(data.threatIncidents)) {
+    await chrome.storage.local.set({ threatIncidents: [] });
+  }
+  if (typeof data.threatsBlockedTotal === 'undefined') {
+    await chrome.storage.local.set({ threatsBlockedTotal: 0 });
   }
 
   setupContextMenus();
@@ -284,12 +297,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const tabId = request.tabId;
     const domain = (request.domain || '').toLowerCase();
 
-    chrome.storage.local.get(['isEnabled', 'whitelistedDomains', 'totalBlocked']).then((data) => {
+    chrome.storage.local.get([
+      'isEnabled',
+      'whitelistedDomains',
+      'totalBlocked',
+      'sentinelEnabled',
+      'threatsBlockedTotal'
+    ]).then((data) => {
       const isEnabled = typeof data.isEnabled === 'boolean' ? data.isEnabled : true;
       const whitelistedDomains = data.whitelistedDomains || [];
       const totalBlocked = data.totalBlocked || 0;
+      const sentinelEnabled = typeof data.sentinelEnabled === 'boolean' ? data.sentinelEnabled : true;
+      const threatsBlockedTotal = data.threatsBlockedTotal || 0;
       const isWhitelisted = whitelistedDomains.includes(domain);
       const pageBlocked = tabId ? (tabStats.get(tabId) || 0) : 0;
+      const threatInfo = tabId ? (tabThreats.get(tabId) || { threatScore: 0, isQuarantined: false }) : { threatScore: 0, isQuarantined: false };
 
       sendResponse({
         isEnabled,
@@ -297,7 +319,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         pageBlocked,
         totalBlocked,
         domain,
-        whitelistedDomains
+        whitelistedDomains,
+        sentinelEnabled,
+        threatsBlockedTotal,
+        threatScore: threatInfo.threatScore,
+        isQuarantined: threatInfo.isQuarantined
       });
     });
     return true;
@@ -427,8 +453,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (action === 'resetStats') {
-    chrome.storage.local.set({ totalBlocked: 0 }, () => {
+    chrome.storage.local.set({ totalBlocked: 0, threatsBlockedTotal: 0 }, () => {
       tabStats.clear();
+      tabThreats.clear();
       chrome.tabs.query({}, (tabs) => {
         for (const tab of tabs) {
           if (tab.id) updateTabBadge(tab.id, 0);
@@ -438,9 +465,91 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
     return true;
   }
+
+  // DevOps Security Sentinel Telemetry Handlers
+  if (action === 'reportThreatTelemetry') {
+    const tabId = sender.tab ? sender.tab.id : null;
+    const { domain, url, threatScore = 0, violation } = request.data || request;
+
+    if (tabId) {
+      const current = tabThreats.get(tabId) || { threatScore: 0, isQuarantined: false, violations: [] };
+      current.threatScore = Math.max(current.threatScore, threatScore);
+      if (violation) current.violations = [...(current.violations || []), violation];
+      tabThreats.set(tabId, current);
+
+      // If threat score exceeds warning threshold, update badge
+      if (current.threatScore >= 35 && !current.isQuarantined) {
+        chrome.action.setBadgeText({ text: '!', tabId });
+        chrome.action.setBadgeBackgroundColor({ color: '#f59e0b', tabId });
+      }
+    }
+
+    sendResponse({ success: true });
+    return false;
+  }
+
+  if (action === 'siteQuarantined') {
+    const tabId = sender.tab ? sender.tab.id : null;
+    const { domain, url, threatScore = 80, violations = [] } = request;
+
+    if (tabId) {
+      tabThreats.set(tabId, { threatScore, isQuarantined: true, violations });
+      chrome.action.setBadgeText({ text: 'BLOCK', tabId });
+      chrome.action.setBadgeBackgroundColor({ color: '#f43f5e', tabId });
+    }
+
+    const incident = {
+      id: 'inc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      domain: domain || 'unknown',
+      url: url || '',
+      threatScore,
+      violationsCount: violations.length,
+      violationsSummary: violations.map(v => v.type).slice(0, 4),
+      timestamp: new Date().toISOString()
+    };
+
+    chrome.storage.local.get(['threatIncidents', 'threatsBlockedTotal']).then(({ threatIncidents = [], threatsBlockedTotal = 0 }) => {
+      const updated = [incident, ...threatIncidents].slice(0, 100);
+      chrome.storage.local.set({
+        threatIncidents: updated,
+        threatsBlockedTotal: threatsBlockedTotal + 1
+      });
+    });
+
+    sendResponse({ success: true, incidentId: incident.id });
+    return false;
+  }
+
+  if (action === 'getThreatIncidents') {
+    chrome.storage.local.get(['threatIncidents', 'threatsBlockedTotal', 'sentinelEnabled']).then((data) => {
+      sendResponse({
+        incidents: data.threatIncidents || [],
+        threatsBlockedTotal: data.threatsBlockedTotal || 0,
+        sentinelEnabled: typeof data.sentinelEnabled === 'boolean' ? data.sentinelEnabled : true
+      });
+    });
+    return true;
+  }
+
+  if (action === 'clearThreatIncidents') {
+    chrome.storage.local.set({ threatIncidents: [] }).then(() => {
+      sendResponse({ success: true });
+    });
+    return true;
+  }
+
+  if (action === 'toggleSentinel') {
+    chrome.storage.local.get(['sentinelEnabled']).then(async ({ sentinelEnabled = true }) => {
+      const newState = !sentinelEnabled;
+      await chrome.storage.local.set({ sentinelEnabled: newState });
+      sendResponse({ sentinelEnabled: newState });
+    });
+    return true;
+  }
 });
 
 // Clean up tabs on close
 chrome.tabs.onRemoved.addListener((tabId) => {
   tabStats.delete(tabId);
+  tabThreats.delete(tabId);
 });

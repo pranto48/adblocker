@@ -78,6 +78,39 @@
       </div>
     </div>
 
+    <!-- iOS 27 Behavioral Security Sentinel Card -->
+    <div class="sentinel-card" id="sentinelCard">
+      <div class="sentinel-row">
+        <div class="sentinel-badge-group">
+          <div class="sentinel-status-ring safe" id="sentinelStatusRing">
+            <span class="sentinel-inner-dot"></span>
+          </div>
+          <div>
+            <div class="sentinel-title-row">
+              <span class="sentinel-brand">DevOps Sentinel</span>
+              <span class="sentinel-pill safe" id="sentinelStatusPill">CLEAN</span>
+            </div>
+            <p class="sentinel-desc" id="sentinelStateDesc">সাইটের আচরণ সম্পূর্ণ নিরাপদ ও স্বাভাবিক</p>
+          </div>
+        </div>
+        <div class="sentinel-score-wrap">
+          <span class="sentinel-score-num" id="sentinelScoreNum">0</span>
+          <span class="sentinel-score-max">/100</span>
+        </div>
+      </div>
+
+      <div class="sentinel-bar-track">
+        <div class="sentinel-bar-fill safe" id="sentinelBarFill" style="width: 0%;"></div>
+      </div>
+
+      <div class="sentinel-footer-row">
+        <span class="sentinel-stat-text">ক্ষতিকর ট্র্যাপ ব্লকড: <strong id="threatsBlockedVal">0</strong></span>
+        <button id="testQuarantineBtn" class="sentinel-quick-btn" title="নিরাপত্তা কোয়ারেন্টাইন টেস্ট করুন">
+          🛡️ Test Shield
+        </button>
+      </div>
+    </div>
+
     <!-- Quick Productivity Tools Bar -->
     <div class="tools-bar">
       <button id="zapperBtn" class="tool-btn zapper-btn" title="Click to permanently zap any unwanted element on the page">

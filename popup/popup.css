@@ -456,6 +456,237 @@ input:checked + .slider:before {
 }
 
 /* ==============================================================================
+   IOS 27 BEHAVIORAL SECURITY SENTINEL CARD
+   ============================================================================== */
+.sentinel-card {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  background: 
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(0, 242, 254, 0.14) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%),
+    var(--liquid-glass-card);
+  border: 1px solid var(--liquid-glass-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.45), var(--liquid-specular-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  transition: var(--transition-liquid);
+}
+
+.sentinel-card:hover {
+  border-color: var(--liquid-glass-border-bright);
+  box-shadow: 0 14px 28px -6px rgba(0, 0, 0, 0.6), var(--liquid-specular-top);
+}
+
+.sentinel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.sentinel-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sentinel-status-ring {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.12);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s ease;
+}
+
+.sentinel-status-ring.warn {
+  border-color: rgba(245, 158, 11, 0.5);
+  background: rgba(245, 158, 11, 0.15);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+}
+
+.sentinel-status-ring.danger {
+  border-color: rgba(244, 63, 94, 0.6);
+  background: rgba(244, 63, 94, 0.2);
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.6);
+  animation: dangerPulse 1.5s infinite;
+}
+
+@keyframes dangerPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.sentinel-inner-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--neon-emerald);
+  box-shadow: 0 0 6px var(--neon-emerald);
+}
+
+.sentinel-status-ring.warn .sentinel-inner-dot {
+  background: var(--neon-amber);
+  box-shadow: 0 0 6px var(--neon-amber);
+}
+
+.sentinel-status-ring.danger .sentinel-inner-dot {
+  background: var(--neon-rose);
+  box-shadow: 0 0 8px var(--neon-rose);
+}
+
+.sentinel-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sentinel-brand {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.sentinel-pill {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1.5px 6px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+}
+
+.sentinel-pill.safe {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.sentinel-pill.warn {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.sentinel-pill.danger {
+  background: rgba(244, 63, 94, 0.25);
+  color: #f87171;
+  border: 1px solid rgba(244, 63, 94, 0.5);
+}
+
+.sentinel-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 1px;
+  line-height: 1.3;
+}
+
+.sentinel-score-wrap {
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+.sentinel-score-num {
+  font-size: 18px;
+  font-weight: 800;
+  color: #34d399;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+  transition: all 0.3s ease;
+}
+
+.sentinel-score-num.warn {
+  color: #fbbf24;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+.sentinel-score-num.danger {
+  color: #f43f5e;
+  text-shadow: 0 0 12px rgba(244, 63, 94, 0.6);
+}
+
+.sentinel-score-max {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* iOS Bar Track */
+.sentinel-bar-track {
+  width: 100%;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.sentinel-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease;
+}
+
+.sentinel-bar-fill.safe {
+  background: linear-gradient(90deg, #10b981 0%, #00f2fe 100%);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.sentinel-bar-fill.warn {
+  background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+.sentinel-bar-fill.danger {
+  background: linear-gradient(90deg, #f43f5e 0%, #e11d48 100%);
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.7);
+}
+
+/* Footer Row */
+.sentinel-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 4px;
+}
+
+.sentinel-stat-text {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.sentinel-stat-text strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.sentinel-quick-btn {
+  padding: 3px 9px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--neon-cyan);
+  cursor: pointer;
+  transition: var(--transition-liquid);
+}
+
+.sentinel-quick-btn:hover {
+  background: rgba(0, 242, 254, 0.18);
+  border-color: var(--neon-cyan);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* ==============================================================================
    QUICK PRODUCTIVITY TOOLS BAR
    ============================================================================== */
 .tools-bar {

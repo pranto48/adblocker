@@ -22,6 +22,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const resetStatsBtn = document.getElementById('resetStatsBtn');
   const statusNotification = document.getElementById('statusNotification');
 
+  // DevOps Sentinel Elements
+  const sentinelMasterToggle = document.getElementById('sentinelMasterToggle');
+  const threatsTableBody = document.getElementById('threatsTableBody');
+  const exportThreatsBtn = document.getElementById('exportThreatsBtn');
+  const clearThreatsBtn = document.getElementById('clearThreatsBtn');
+
   function showNotification(msg, isError = false) {
     statusNotification.textContent = msg;
     statusNotification.style.color = isError ? '#f43f5e' : '#10b981';
@@ -34,16 +40,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load all settings
   function loadDashboard() {
     chrome.storage.local.get(
-      ['isEnabled', 'whitelistedDomains', 'customBlockedSelectors', 'totalBlocked'],
+      ['isEnabled', 'whitelistedDomains', 'customBlockedSelectors', 'totalBlocked', 'sentinelEnabled', 'threatIncidents', 'threatsBlockedTotal'],
       (data) => {
         const isEnabled = typeof data.isEnabled === 'boolean' ? data.isEnabled : true;
         const whitelistedDomains = data.whitelistedDomains || [];
         const customRules = data.customBlockedSelectors || {};
+        const sentinelEnabled = typeof data.sentinelEnabled === 'boolean' ? data.sentinelEnabled : true;
+        const threatIncidents = data.threatIncidents || [];
 
         globalEngineToggle.checked = isEnabled;
+        if (sentinelMasterToggle) sentinelMasterToggle.checked = sentinelEnabled;
 
         renderWhitelistTable(whitelistedDomains);
         renderZapperRules(customRules);
+        renderThreatsTable(threatIncidents);
       }
     );
   }
@@ -222,6 +232,88 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
   });
+
+  // Render DevOps Threat Incident Table
+  function renderThreatsTable(incidents) {
+    if (!threatsTableBody) return;
+    threatsTableBody.innerHTML = '';
+
+    if (!incidents || incidents.length === 0) {
+      threatsTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center; color: #64748b; padding: 22px;">
+            কোনো ক্ষতিকারক বা অস্বাভাবিক আচরণের ঘটনা এখনো রেকর্ড হয়নি। সমস্ত সাইট নিরাপদ!
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    incidents.forEach((inc) => {
+      const tr = document.createElement('tr');
+      const timeStr = inc.timestamp ? new Date(inc.timestamp).toLocaleTimeString() : 'N/A';
+
+      tr.innerHTML = `
+        <td style="font-family: monospace; font-size: 11px; color: #94a3b8;">${timeStr}</td>
+        <td style="font-weight: 700; color: #ffffff;">${inc.domain || 'Unknown'}</td>
+        <td>
+          <span style="font-family: monospace; font-weight: 800; color: #f43f5e; background: rgba(244,63,94,0.15); padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(244,63,94,0.3);">
+            ${inc.threatScore}/100 [CRITICAL]
+          </span>
+        </td>
+        <td style="font-family: monospace; font-size: 11px; color: #38bdf8;">
+          ${(inc.violationsSummary || []).join(', ') || `${inc.violationsCount || 1} Vectors`}
+        </td>
+        <td>
+          <span style="background: rgba(244,63,94,0.2); color: #f87171; border: 1px solid rgba(244,63,94,0.4); padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 800;">
+            QUARANTINED
+          </span>
+        </td>
+      `;
+      threatsTableBody.appendChild(tr);
+    });
+  }
+
+  // Sentinel Master Toggle Event
+  if (sentinelMasterToggle) {
+    sentinelMasterToggle.addEventListener('change', () => {
+      chrome.runtime.sendMessage({ action: 'toggleSentinel' }, (res) => {
+        if (res) {
+          showNotification(res.sentinelEnabled ? 'DevOps Security Sentinel Activated.' : 'DevOps Security Sentinel Deactivated.');
+        }
+      });
+    });
+  }
+
+  // Export Threat Incident Audit Log (JSON)
+  if (exportThreatsBtn) {
+    exportThreatsBtn.addEventListener('click', () => {
+      chrome.storage.local.get(['threatIncidents', 'threatsBlockedTotal'], (data) => {
+        const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data, null, 2));
+        const a = document.createElement('a');
+        a.setAttribute('href', dataStr);
+        a.setAttribute('download', `ampblock_threat_audit_${Date.now()}.json`);
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        showNotification('Threat audit log exported successfully!');
+      });
+    });
+  }
+
+  // Clear Threat Incidents
+  if (clearThreatsBtn) {
+    clearThreatsBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear all recorded threat incidents?')) {
+        chrome.runtime.sendMessage({ action: 'clearThreatIncidents' }, (res) => {
+          if (res && res.success) {
+            renderThreatsTable([]);
+            showNotification('Threat incidents log cleared.');
+          }
+        });
+      }
+    });
+  }
 
   loadDashboard();
 });

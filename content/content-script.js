@@ -217,6 +217,15 @@
     return true;
   });
 
+  // Bridge listener for Security Sentinel events from MAIN world
+  window.addEventListener('message', (event) => {
+    if (event.source !== window || !event.data || event.data.type !== '__AMPBLOCK_SENTINEL_EVENT__') return;
+    const { action, payload } = event.data;
+    try {
+      chrome.runtime.sendMessage({ action, ...payload }).catch(() => {});
+    } catch (e) {}
+  });
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
