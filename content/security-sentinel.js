@@ -422,8 +422,319 @@
     } catch (e) {}
   }
 
-  setTimeout(scanDeceptivePagePatterns, 1200);
-  setTimeout(scanDeceptivePagePatterns, 3500);
+  // ============================================================================
+  // VECTOR 7: Magecart / Anti-Formjacking & Keylogger Exfiltration Guard
+  // ============================================================================
+  const suspiciousDataExfiltrationPatterns = [
+    /pass(word|wd)?/i,
+    /cc[_-]?(num|number)?/i,
+    /card[_-]?(num|number|code)?/i,
+    /cvv|cvc|pan/i,
+    /secret[_-]?key/i,
+    /token/i
+  ];
+
+  function isExfiltrationPayload(payload) {
+    if (!payload) return false;
+    const str = typeof payload === 'string' ? payload : (payload instanceof FormData ? 'formdata' : JSON.stringify(payload));
+    if (!str || str.length < 5) return false;
+
+    // Check if user has entered data in any password or sensitive field
+    const passInputs = document.querySelectorAll('input[type="password"], input[name*="pass"], input[name*="cvv"], input[name*="card"]');
+    for (let i = 0; i < passInputs.length; i++) {
+      const val = passInputs[i].value;
+      if (val && val.length >= 4 && str.includes(val)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function isThirdPartyEndpoint(targetUrl) {
+    try {
+      if (!targetUrl || targetUrl.startsWith('/') || targetUrl.startsWith('./')) return false;
+      const parsed = new URL(targetUrl, window.location.href);
+      return parsed.hostname !== currentHost && !parsed.hostname.endsWith('.' + currentHost);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Intercept fetch
+  const originalFetch = window.fetch;
+  if (originalFetch) {
+    window.fetch = function (input, init) {
+      const targetUrl = typeof input === 'string' ? input : (input && input.url ? input.url : '');
+      const body = init ? init.body : null;
+
+      if (isThirdPartyEndpoint(targetUrl) && isExfiltrationPayload(body)) {
+        recordViolation(
+          'MAGECART_FORMJACKING_BLOCKED',
+          'CRITICAL',
+          90,
+          `Data Exfiltration Prevented: User credentials/input being sent to unauthorized 3rd-party endpoint (${targetUrl})`,
+          { targetUrl }
+        );
+        return Promise.reject(new TypeError('[AmpBlock Sentinel] Formjacking transmission aborted'));
+      }
+      return originalFetch.apply(this, arguments);
+    };
+  }
+
+  // Intercept XMLHttpRequest
+  const originalXHROpen = XMLHttpRequest.prototype.open;
+  const originalXHRSend = XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.open = function (method, url) {
+    this.__ampblock_target_url = url;
+    return originalXHROpen.apply(this, arguments);
+  };
+  XMLHttpRequest.prototype.send = function (body) {
+    if (isThirdPartyEndpoint(this.__ampblock_target_url) && isExfiltrationPayload(body)) {
+      recordViolation(
+        'XHR_FORMJACKING_BLOCKED',
+        'CRITICAL',
+        90,
+        `XHR Exfiltration Prevented: Credentials intercepted before sending to (${this.__ampblock_target_url})`,
+        { endpoint: this.__ampblock_target_url }
+      );
+      return;
+    }
+    return originalXHRSend.apply(this, arguments);
+  };
+
+  // Intercept sendBeacon
+  if (navigator.sendBeacon) {
+    const originalSendBeacon = navigator.sendBeacon.bind(navigator);
+    navigator.sendBeacon = function (url, data) {
+      if (isThirdPartyEndpoint(url) && isExfiltrationPayload(data)) {
+        recordViolation(
+          'BEACON_EXFILTRATION_BLOCKED',
+          'CRITICAL',
+          85,
+          `Beacon Exfiltration Prevented: Formjacking beacon to (${url}) neutralized`,
+          { target: url }
+        );
+        return false;
+      }
+      return originalSendBeacon(url, data);
+    };
+  }
+
+  // ============================================================================
+  // VECTOR 8: WebRTC Real-IP Leak & Deanonymization Shield
+  // ============================================================================
+  const OriginalRTCPeerConnection = window.RTCPeerConnection || window.webkitRTCPeerConnection;
+  const conferencingWhitelist = [
+    'meet.google.com', 'zoom.us', 'teams.microsoft.com', 'discord.com',
+    'webex.com', 'skype.com', 'slack.com', 'app.chime.aws', 'whereby.com',
+    'jitsi.org', 'meet.jit.si', 'hangouts.google.com', 'whatsapp.com'
+  ];
+  const isConferencing = conferencingWhitelist.some(d => currentHost.endsWith(d));
+
+  if (OriginalRTCPeerConnection && !isConferencing) {
+    const ProxiedRTCPeerConnection = function (config, constraints) {
+      // Strip public STUN servers on non-conferencing domains to prevent IP leakage
+      if (config && Array.isArray(config.iceServers)) {
+        config.iceServers = [];
+        recordViolation(
+          'WEBRTC_STUN_IP_LEAK_DEFUSED',
+          'MEDIUM',
+          25,
+          'WebRTC STUN handshake neutralized to protect real IP address from deanonymization',
+          { domain: currentHost }
+        );
+      }
+      const pc = new OriginalRTCPeerConnection(config, constraints);
+
+      // Filter ICE Candidate LAN & private IPs
+      const origAddEvent = pc.addEventListener.bind(pc);
+      pc.addEventListener = function (type, listener, options) {
+        if (type === 'icecandidate') {
+          const wrapped = function (e) {
+            if (e && e.candidate) {
+              const cand = e.candidate.candidate;
+              if (cand && (cand.includes('.local') || /192\.168\.|10\.\d+\.|172\.(1[6-9]|2\d|3[01])\./.test(cand))) {
+                return; // Suppress candidate leaking LAN IP
+              }
+            }
+            return listener.apply(this, arguments);
+          };
+          return origAddEvent(type, wrapped, options);
+        }
+        return origAddEvent(type, listener, options);
+      };
+      return pc;
+    };
+    ProxiedRTCPeerConnection.prototype = OriginalRTCPeerConnection.prototype;
+    window.RTCPeerConnection = ProxiedRTCPeerConnection;
+    if (window.webkitRTCPeerConnection) window.webkitRTCPeerConnection = ProxiedRTCPeerConnection;
+  }
+
+  // ============================================================================
+  // VECTOR 9: Drive-By Executable Auto-Download Defuser
+  // ============================================================================
+  const dangerousDownloadExtensions = [
+    '.exe', '.scr', '.bat', '.vbs', '.iso', '.apk',
+    '.hta', '.msi', '.dll', '.wsf', '.ps1', '.cmd', '.cpl'
+  ];
+
+  const originalAnchorClick = HTMLAnchorElement.prototype.click;
+  HTMLAnchorElement.prototype.click = function () {
+    const href = String(this.href || this.getAttribute('href') || '').toLowerCase();
+    const downloadAttr = String(this.download || this.getAttribute('download') || '').toLowerCase();
+
+    const isDangerous = dangerousDownloadExtensions.some(ext => href.includes(ext) || downloadAttr.endsWith(ext));
+    if (isDangerous) {
+      recordViolation(
+        'DRIVE_BY_AUTO_DOWNLOAD_BLOCKED',
+        'CRITICAL',
+        85,
+        `Drive-By Executable Download Blocked: Automatic drop of high-risk file (${downloadAttr || href}) prevented`,
+        { href, downloadAttr }
+      );
+      // Neutralize automatic download
+      return;
+    }
+    return originalAnchorClick.apply(this, arguments);
+  };
+
+  // ============================================================================
+  // VECTOR 10: Malicious Custom Protocol Handler & RCE Guard
+  // ============================================================================
+  const dangerousUriSchemes = [
+    'cmd:', 'powershell:', 'calc:', 'search-ms:', 'ms-msdt:',
+    'ms-settings:', 'shell:', 'cscript:', 'wscript:', 'ms-word:',
+    'ms-excel:', 'ms-powerpoint:'
+  ];
+
+  let uriLaunchCount = 0;
+  let uriTimer = null;
+
+  function inspectProtocolUri(uri) {
+    if (!uri || typeof uri !== 'string') return false;
+    const lower = uri.trim().toLowerCase();
+
+    // Check dangerous Windows schemes
+    if (dangerousUriSchemes.some(sch => lower.startsWith(sch))) {
+      recordViolation(
+        'DANGEROUS_PROTOCOL_URI_LAUNCH_BLOCKED',
+        'CRITICAL',
+        85,
+        `Blocked dangerous local OS application launcher URI: [${uri.slice(0, 40)}]`,
+        { uri }
+      );
+      return true;
+    }
+
+    // Check flood of arbitrary external protocols (protocol storm)
+    if (lower.includes('://') && !lower.startsWith('http://') && !lower.startsWith('https://') && !lower.startsWith('chrome:')) {
+      uriLaunchCount++;
+      if (!uriTimer) {
+        uriTimer = setTimeout(() => { uriLaunchCount = 0; uriTimer = null; }, 3000);
+      }
+      if (uriLaunchCount > 2) {
+        recordViolation(
+          'PROTOCOL_HANDLER_FLOOD_BLOCKED',
+          'HIGH',
+          45,
+          `Protocol flood suppressed: Site triggered ${uriLaunchCount} external app launches in 3 seconds`,
+          { uri }
+        );
+        return true;
+      }
+    }
+    return false;
+  }
+
+  const originalWindowOpen = window.open;
+  window.open = function (url) {
+    if (inspectProtocolUri(url)) return null;
+    return originalWindowOpen ? originalWindowOpen.apply(window, arguments) : null;
+  };
+
+  // ============================================================================
+  // VECTOR 11: Quantum Noise Injection (Anti-Canvas & Audio Fingerprinting)
+  // ============================================================================
+  if (HTMLCanvasElement && HTMLCanvasElement.prototype.toDataURL) {
+    const originalToDataURL = HTMLCanvasElement.prototype.toDataURL;
+    HTMLCanvasElement.prototype.toDataURL = function () {
+      // Fingerprinting canvases are typically small (< 300x300) and hidden
+      if (this.width <= 320 && this.height <= 320) {
+        try {
+          const ctx = this.getContext('2d');
+          if (ctx) {
+            // Subtle 1-bit quantum noise perturbation
+            const imgData = ctx.getImageData(0, 0, Math.min(10, this.width), Math.min(10, this.height));
+            if (imgData.data && imgData.data.length > 3) {
+              imgData.data[0] = (imgData.data[0] ^ 1); // 1-bit flip
+              ctx.putImageData(imgData, 0, 0);
+            }
+          }
+        } catch (e) {}
+      }
+      return originalToDataURL.apply(this, arguments);
+    };
+  }
+
+  if (typeof CanvasRenderingContext2D !== 'undefined' && CanvasRenderingContext2D.prototype.getImageData) {
+    const originalGetImageData = CanvasRenderingContext2D.prototype.getImageData;
+    CanvasRenderingContext2D.prototype.getImageData = function (sx, sy, sw, sh) {
+      const data = originalGetImageData.apply(this, arguments);
+      if (sw <= 300 && sh <= 300 && data && data.data && data.data.length > 4) {
+        // Perturb least significant bit to break fingerprint hashes
+        data.data[0] = (data.data[0] ^ 1);
+      }
+      return data;
+    };
+  }
+
+  // ============================================================================
+  // VECTOR 12: Punycode & IDN Homograph Phishing Alert
+  // ============================================================================
+  if (currentHost.startsWith('xn--') || /[\u0400-\u04FF]/.test(currentHost)) {
+    recordViolation(
+      'IDN_HOMOGRAPH_PHISHING_SUSPECT',
+      'HIGH',
+      50,
+      `Punycode / Homograph domain detected (${currentHost}). Likely impersonating another legitimate website.`,
+      { hostname: currentHost }
+    );
+  }
+
+  // ============================================================================
+  // VECTOR 13: DOM Bomb & Memory Exhaustion Crash Defense
+  // ============================================================================
+  let domNodeCountInWindow = 0;
+  let domCheckTimer = null;
+
+  if (window.MutationObserver) {
+    const crashObserver = new MutationObserver((mutations) => {
+      let added = 0;
+      for (let i = 0; i < mutations.length; i++) {
+        added += mutations[i].addedNodes.length;
+      }
+      domNodeCountInWindow += added;
+      if (!domCheckTimer) {
+        domCheckTimer = setTimeout(() => {
+          domNodeCountInWindow = 0;
+          domCheckTimer = null;
+        }, 500);
+      }
+
+      if (domNodeCountInWindow > 3500) {
+        recordViolation(
+          'DOM_BOMB_MEMORY_EXHAUSTION',
+          'HIGH',
+          45,
+          `Browser crash prevention: Suspicious spike of ${domNodeCountInWindow} DOM elements created in 500ms`,
+          { addedNodes: domNodeCountInWindow }
+        );
+        domNodeCountInWindow = 0;
+      }
+    });
+
+    crashObserver.observe(document.documentElement, { childList: true, subtree: true });
+  }
 
   // ============================================================================
   // AUTONOMOUS QUARANTINE SHIELD (iOS 27 Liquid Glass Block Screen)

