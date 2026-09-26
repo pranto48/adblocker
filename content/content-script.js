@@ -2,11 +2,13 @@
  * ==============================================================================
  * # Copyright (c) 2026 IT support BD (https://itsupport.com.bd)
  * # Made By Arif (https://arifmahmud.com/)
- * # Project: AmpBlock
+ * # Project: AmpBlock Pro
  * ==============================================================================
  *
  * AmpBlock - Universal Content Script
- * Monitors DOM for ad elements, tracks counts, collapses empty ad frames, and syncs with background worker.
+ * Dynamically injects cosmetic filters only when active, synchronizes whitelist
+ * state with the MAIN world, collapses ad frames, and instantly unhides elements
+ * when ads are allowed on trusted sites.
  */
 
 (function () {
@@ -15,11 +17,12 @@
   if (window.__ampblock_injected) return;
   window.__ampblock_injected = true;
 
-  const currentHost = window.location.hostname;
+  const currentHost = window.location.hostname.toLowerCase();
   let isEnabled = true;
   let isWhitelisted = false;
   let blockedCount = 0;
   const processedNodes = new WeakSet();
+  let observer = null;
 
   const adSelectors = [
     'ins.adsbygoogle',
@@ -72,10 +75,80 @@
     '.ad-sticky'
   ];
 
-  let fullSelector = adSelectors.join(', ');
+  const fullSelector = adSelectors.join(', ');
+
+  // Synchronize state with DOM dataset and sessionStorage for MAIN world scripts
+  function syncStatusToDOM() {
+    if (!document.documentElement) return;
+
+    if (!isEnabled) {
+      document.documentElement.dataset.ampblockDisabled = 'true';
+      delete document.documentElement.dataset.ampblockActive;
+      delete document.documentElement.dataset.ampblockWhitelisted;
+    } else if (isWhitelisted) {
+      document.documentElement.dataset.ampblockWhitelisted = 'true';
+      delete document.documentElement.dataset.ampblockActive;
+      delete document.documentElement.dataset.ampblockDisabled;
+    } else {
+      document.documentElement.dataset.ampblockActive = 'true';
+      delete document.documentElement.dataset.ampblockWhitelisted;
+      delete document.documentElement.dataset.ampblockDisabled;
+    }
+
+    try {
+      sessionStorage.setItem('__ampblock_whitelisted', String(isWhitelisted));
+      sessionStorage.setItem('__ampblock_disabled', String(!isEnabled));
+    } catch (e) {}
+
+    window.postMessage({
+      type: '__AMPBLOCK_STATUS_SYNC__',
+      isEnabled,
+      isWhitelisted
+    }, '*');
+  }
+
+  // Dynamically inject cosmetic filter CSS only when allowed
+  function injectCosmeticCSS() {
+    if (!isEnabled || isWhitelisted) return;
+    const styleId = 'ampblock-cosmetic-filter-link';
+    if (document.getElementById(styleId)) return;
+
+    const link = document.createElement('link');
+    link.id = styleId;
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = chrome.runtime.getURL('content/cosmetic-filter.css');
+    (document.head || document.documentElement).appendChild(link);
+  }
+
+  // Remove cosmetic filter CSS when ads are allowed on this site
+  function removeCosmeticCSS() {
+    const link = document.getElementById('ampblock-cosmetic-filter-link');
+    if (link) link.remove();
+    const customStyle = document.getElementById('ampblock-custom-zapped-style');
+    if (customStyle) customStyle.remove();
+  }
+
+  // Restore elements that were previously collapsed inline
+  function restoreHiddenElements() {
+    try {
+      const elements = document.querySelectorAll(fullSelector);
+      for (let i = 0; i < elements.length; i++) {
+        const el = elements[i];
+        el.style.removeProperty('display');
+        el.style.removeProperty('visibility');
+        el.style.removeProperty('height');
+        el.style.removeProperty('min-height');
+        el.style.removeProperty('margin');
+        el.style.removeProperty('padding');
+      }
+    } catch (e) {}
+  }
 
   // Inject custom user-zapped selectors for this domain
   function loadCustomRules() {
+    if (!isEnabled || isWhitelisted) return;
+
     chrome.storage.local.get(['customBlockedSelectors'], (data) => {
       const allRules = data.customBlockedSelectors || {};
       const domainRules = allRules[currentHost] || [];
@@ -102,31 +175,32 @@
     });
   }
 
-  // Query background for site status
+  // Query background for site status and configure DOM
   function init() {
-    chrome.runtime.sendMessage(
-      { action: 'getSiteStatus', domain: currentHost },
-      (response) => {
-        if (chrome.runtime.lastError || !response) {
-          scanAndPurge();
-          loadCustomRules();
-          startObserver();
-          return;
-        }
+    chrome.storage.local.get(['isEnabled', 'whitelistedDomains'], (data) => {
+      const enabled = typeof data.isEnabled === 'boolean' ? data.isEnabled : true;
+      const whitelistedDomains = data.whitelistedDomains || [];
+      const whitelisted = whitelistedDomains.includes(currentHost) ||
+                          whitelistedDomains.some(d => currentHost.endsWith('.' + d));
 
-        isEnabled = response.enabled;
-        isWhitelisted = response.isWhitelisted;
+      isEnabled = enabled;
+      isWhitelisted = whitelisted;
 
-        if (isEnabled && !isWhitelisted) {
-          scanAndPurge();
-          loadCustomRules();
-          startObserver();
-        }
+      syncStatusToDOM();
+
+      if (isEnabled && !isWhitelisted) {
+        injectCosmeticCSS();
+        loadCustomRules();
+        scanAndPurge();
+        startObserver();
+      } else {
+        removeCosmeticCSS();
+        restoreHiddenElements();
       }
-    );
+    });
   }
 
-  // Scan document for ad elements and aggressively collapse them
+  // Scan document for ad elements and collapse them
   function scanAndPurge() {
     if (!isEnabled || isWhitelisted) return;
 
@@ -168,12 +242,13 @@
   // Observer for dynamic infinite scroll / AJAX loaded ads
   let debounceTimeout = null;
   function startObserver() {
-    if (!document.body) {
+    if (observer) observer.disconnect();
+    if (!document.body && !document.documentElement) {
       document.addEventListener('DOMContentLoaded', startObserver, { once: true });
       return;
     }
 
-    const observer = new MutationObserver(() => {
+    observer = new MutationObserver(() => {
       if (!isEnabled || isWhitelisted) return;
 
       if (debounceTimeout) clearTimeout(debounceTimeout);
@@ -193,10 +268,17 @@
     if (msg.action === 'statusChanged') {
       isEnabled = msg.enabled;
       isWhitelisted = msg.isWhitelisted;
+      syncStatusToDOM();
 
       if (isEnabled && !isWhitelisted) {
-        scanAndPurge();
+        injectCosmeticCSS();
         loadCustomRules();
+        scanAndPurge();
+        startObserver();
+      } else {
+        removeCosmeticCSS();
+        restoreHiddenElements();
+        if (observer) observer.disconnect();
       }
       sendResponse({ success: true, count: blockedCount });
     } else if (msg.action === 'getPageStats') {
@@ -226,9 +308,11 @@
     } catch (e) {}
   });
 
+  // Ensure DOM status is set immediately
+  syncStatusToDOM();
+  init();
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
   }
 })();

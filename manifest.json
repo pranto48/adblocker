@@ -64,14 +64,10 @@
       "matches": [
         "<all_urls>"
       ],
-      "css": [
-        "content/cosmetic-filter.css",
-        "content/quarantine-shield.css"
-      ],
       "js": [
         "content/content-script.js"
       ],
-      "run_at": "document_idle"
+      "run_at": "document_start"
     },
     {
       "matches": [
@@ -88,7 +84,8 @@
       "resources": [
         "content/element-zapper.js",
         "content/security-sentinel.js",
-        "content/quarantine-shield.css"
+        "content/quarantine-shield.css",
+        "content/cosmetic-filter.css"
       ],
       "matches": [
         "<all_urls>"

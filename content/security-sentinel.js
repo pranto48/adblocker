@@ -24,14 +24,29 @@
   const currentHost = window.location.hostname.toLowerCase();
   const currentUrl = window.location.href;
 
-  // Check if current site is exempted / temporarily bypassed in this session
+  // Check if current site is exempted / whitelisted or protection is disabled
   const BYPASS_KEY = '__ampblock_bypass_' + currentHost;
-  try {
-    if (sessionStorage.getItem(BYPASS_KEY) === 'true') {
-      console.info('[AmpBlock Sentinel] Site bypassed for this session by user override:', currentHost);
-      return;
+  function isSentinelBypassed() {
+    if (document.documentElement && (
+      document.documentElement.dataset.ampblockWhitelisted === 'true' ||
+      document.documentElement.dataset.ampblockDisabled === 'true'
+    )) {
+      return true;
     }
-  } catch (e) {}
+    try {
+      if (sessionStorage.getItem('__ampblock_whitelisted') === 'true' ||
+          sessionStorage.getItem('__ampblock_disabled') === 'true' ||
+          sessionStorage.getItem(BYPASS_KEY) === 'true') {
+        return true;
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  if (isSentinelBypassed()) {
+    console.info('[AmpBlock Sentinel] Protection bypassed for trusted site:', currentHost);
+    return;
+  }
 
   // DevOps Telemetry State
   const telemetry = {
@@ -286,9 +301,22 @@
       if (!winW || !winH) return;
 
       for (let i = 0; i < allDivs.length; i++) {
-        const el = allDivs[i];
-        // Skip sentinel UI
+        // Skip sentinel UI, Google One Tap, Facebook SDK, Turnstile, and standard dialogs
         if (el.id === '__ampblock_quarantine_shield__' || el.closest('#__ampblock_quarantine_shield__')) continue;
+        const idLower = (el.id || '').toLowerCase();
+        const classLower = (el.className || '').toString().toLowerCase();
+        if (
+          idLower.includes('google') ||
+          idLower.includes('credential') ||
+          idLower.includes('fb-root') ||
+          classLower.includes('fb_dialog') ||
+          classLower.includes('modal') ||
+          classLower.includes('dialog') ||
+          el.getAttribute('role') === 'dialog' ||
+          el.tagName === 'DIALOG'
+        ) {
+          continue;
+        }
 
         const style = window.getComputedStyle(el);
         if (style.position === 'fixed' || style.position === 'absolute') {
@@ -450,9 +478,44 @@
     return false;
   }
 
+  const LEGITIMATE_AUTH_APIS = [
+    'googleapis.com',
+    'google.com',
+    'gstatic.com',
+    'facebook.com',
+    'facebook.net',
+    'appleid.apple.com',
+    'microsoftonline.com',
+    'live.com',
+    'github.com',
+    'auth0.com',
+    'firebaseio.com',
+    'firebaseapp.com',
+    'supabase.co',
+    'amazonaws.com',
+    'okta.com',
+    'stytch.com',
+    'clerk.dev',
+    'clerk.com',
+    'stripe.com',
+    'paypal.com',
+    'braintreegateway.com'
+  ];
+
+  function isLegitimateAuthEndpoint(url) {
+    if (!url) return false;
+    try {
+      const parsed = new URL(url, window.location.href);
+      return LEGITIMATE_AUTH_APIS.some(api => parsed.hostname === api || parsed.hostname.endsWith('.' + api));
+    } catch (e) {
+      return false;
+    }
+  }
+
   function isThirdPartyEndpoint(targetUrl) {
     try {
       if (!targetUrl || targetUrl.startsWith('/') || targetUrl.startsWith('./')) return false;
+      if (isLegitimateAuthEndpoint(targetUrl)) return false; // Never flag legitimate SSO / Auth / Payment APIs!
       const parsed = new URL(targetUrl, window.location.href);
       return parsed.hostname !== currentHost && !parsed.hostname.endsWith('.' + currentHost);
     } catch (e) {
@@ -655,18 +718,23 @@
   // ============================================================================
   // VECTOR 11: Quantum Noise Injection (Anti-Canvas & Audio Fingerprinting)
   // ============================================================================
+  const CAPTCHA_BOT_HOSTS = [
+    'google.com', 'gstatic.com', 'recaptcha.net', 'cloudflare.com', 'hcaptcha.com',
+    'arkoselabs.com', 'facebook.com', 'apple.com', 'microsoft.com'
+  ];
+  const isBotVerificationDomain = CAPTCHA_BOT_HOSTS.some(d => currentHost.endsWith(d));
+
   if (HTMLCanvasElement && HTMLCanvasElement.prototype.toDataURL) {
     const originalToDataURL = HTMLCanvasElement.prototype.toDataURL;
     HTMLCanvasElement.prototype.toDataURL = function () {
-      // Fingerprinting canvases are typically small (< 300x300) and hidden
-      if (this.width <= 320 && this.height <= 320) {
+      // Never break CAPTCHA / bot verification canvas rendering
+      if (!isBotVerificationDomain && !this.isConnected && this.width <= 128 && this.height <= 128) {
         try {
           const ctx = this.getContext('2d');
           if (ctx) {
-            // Subtle 1-bit quantum noise perturbation
             const imgData = ctx.getImageData(0, 0, Math.min(10, this.width), Math.min(10, this.height));
             if (imgData.data && imgData.data.length > 3) {
-              imgData.data[0] = (imgData.data[0] ^ 1); // 1-bit flip
+              imgData.data[0] = (imgData.data[0] ^ 1);
               ctx.putImageData(imgData, 0, 0);
             }
           }
@@ -680,8 +748,7 @@
     const originalGetImageData = CanvasRenderingContext2D.prototype.getImageData;
     CanvasRenderingContext2D.prototype.getImageData = function (sx, sy, sw, sh) {
       const data = originalGetImageData.apply(this, arguments);
-      if (sw <= 300 && sh <= 300 && data && data.data && data.data.length > 4) {
-        // Perturb least significant bit to break fingerprint hashes
+      if (!isBotVerificationDomain && this.canvas && !this.canvas.isConnected && sw <= 128 && sh <= 128 && data && data.data && data.data.length > 4) {
         data.data[0] = (data.data[0] ^ 1);
       }
       return data;

@@ -24,11 +24,35 @@ function extractHostname(url) {
   }
 }
 
-// Common ad network keywords for auto-closing popup tabs
+// Trusted OAuth and Identity Providers (never auto-close tabs or popups)
+const TRUSTED_AUTH_HOSTS = [
+  'accounts.google.com',
+  'google.com',
+  'facebook.com',
+  'm.facebook.com',
+  'connect.facebook.net',
+  'appleid.apple.com',
+  'login.microsoftonline.com',
+  'login.live.com',
+  'github.com',
+  'twitter.com',
+  'x.com',
+  'linkedin.com',
+  'auth0.com',
+  'firebaseapp.com',
+  'identitytoolkit.googleapis.com',
+  'supabase.co',
+  'discord.com',
+  'slack.com',
+  'paypal.com',
+  'stripe.com'
+];
+
+// Specific ad network keywords for auto-closing popup tabs (never use generic words like redirect)
 const adTabKeywords = [
   'popads',
   'popcash',
-  'propeller',
+  'propellerads',
   'exoclick',
   'trafficjunky',
   'clickadu',
@@ -40,7 +64,6 @@ const adTabKeywords = [
   'yllix',
   'betting',
   'casino',
-  'redirect',
   'rotator',
   'tsyndicate',
   'traffichive',
@@ -48,8 +71,20 @@ const adTabKeywords = [
   'wigetmedia'
 ];
 
+function isAuthOrLegitimateUrl(url) {
+  if (!url || typeof url !== 'string') return true; // Keep blank/pending tabs open!
+  const lower = url.toLowerCase();
+  if (lower.startsWith('chrome://') || lower.startsWith('edge://') || lower.startsWith('about:')) return true;
+  if (TRUSTED_AUTH_HOSTS.some(auth => lower.includes(auth))) return true;
+  if (lower.includes('/oauth') || lower.includes('/signin') || lower.includes('/login') || lower.includes('/authorize') || lower.includes('redirect_uri')) {
+    return true;
+  }
+  return false;
+}
+
 function isAdTabUrl(url) {
   if (!url || typeof url !== 'string') return false;
+  if (isAuthOrLegitimateUrl(url)) return false;
   const lower = url.toLowerCase();
   return adTabKeywords.some(kw => lower.includes(kw));
 }
@@ -213,41 +248,86 @@ async function syncDynamicRules() {
     console.error('Error toggling rulesets:', err);
   }
 
-  // Build whitelist override rules
-  try {
-    const existingRules = await chrome.declarativeNetRequest.getDynamicRules();
-    const existingRuleIds = existingRules.map(r => r.id);
+    // Build whitelist override rules & auth provider protection
+    try {
+      const existingRules = await chrome.declarativeNetRequest.getDynamicRules();
+      const existingRuleIds = existingRules.map(r => r.id);
 
-    const newRules = [];
-    let ruleId = 10000;
+      const newRules = [];
+      let ruleId = 10000;
 
-    for (const domain of whitelistedDomains) {
-      if (!domain) continue;
-      newRules.push({
-        id: ruleId++,
-        priority: 100,
-        action: { type: 'allow' },
-        condition: {
-          initiatorDomains: [domain],
-          resourceTypes: [
-            'main_frame',
-            'sub_frame',
-            'script',
-            'image',
-            'xmlhttprequest',
-            'ping',
-            'media',
-            'other'
-          ]
-        }
+      // 1. Always protect legitimate OAuth / SSO scripts and frames from being blocked
+      const coreAuthHosts = [
+        'accounts.google.com',
+        'apis.google.com',
+        'connect.facebook.net',
+        'appleid.apple.com',
+        'login.microsoftonline.com',
+        'github.com'
+      ];
+      for (const authHost of coreAuthHosts) {
+        newRules.push({
+          id: ruleId++,
+          priority: 200,
+          action: { type: 'allow' },
+          condition: {
+            urlFilter: `||${authHost}^`,
+            resourceTypes: [
+              'main_frame',
+              'sub_frame',
+              'script',
+              'xmlhttprequest',
+              'ping',
+              'image',
+              'other'
+            ]
+          }
+        });
+      }
+
+      // 2. Allow whitelisted domains (both as initiator and as destination)
+      for (const domain of whitelistedDomains) {
+        if (!domain) continue;
+        const rootDomain = domain.replace(/^www\./, '');
+        newRules.push({
+          id: ruleId++,
+          priority: 150,
+          action: { type: 'allow' },
+          condition: {
+            initiatorDomains: [domain, rootDomain, `www.${rootDomain}`],
+            resourceTypes: [
+              'main_frame',
+              'sub_frame',
+              'script',
+              'image',
+              'xmlhttprequest',
+              'ping',
+              'media',
+              'other'
+            ]
+          }
+        });
+
+        // Also allow top-level navigation to whitelisted domain
+        newRules.push({
+          id: ruleId++,
+          priority: 150,
+          action: { type: 'allow' },
+          condition: {
+            urlFilter: `||${rootDomain}^`,
+            resourceTypes: [
+              'main_frame',
+              'sub_frame'
+            ]
+          }
+        });
+      }
+
+      await chrome.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: existingRuleIds,
+        addRules: newRules
       });
-    }
-
-    await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: existingRuleIds,
-      addRules: newRules
-    });
-  } catch (err) {
+    } catch (err) {
     console.error('Failed to sync dynamic whitelist rules:', err);
   }
 }
@@ -405,11 +485,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           chrome.action.setBadgeText({ text: 'PASS', tabId: request.tabId });
           chrome.action.setBadgeBackgroundColor({ color: '#10b981', tabId: request.tabId });
         }
+        // Auto-reload the tab smoothly so allowed ads and scripts work immediately
+        chrome.tabs.reload(request.tabId);
       }
 
       chrome.tabs.query({}, (tabs) => {
         for (const tab of tabs) {
-          if (extractHostname(tab.url) === domain) {
+          const tabHost = extractHostname(tab.url);
+          if (tabHost === domain || tabHost.endsWith('.' + domain)) {
             chrome.tabs.sendMessage(tab.id, {
               action: 'statusChanged',
               enabled: true,

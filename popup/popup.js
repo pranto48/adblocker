@@ -298,6 +298,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     chrome.runtime.sendMessage({ action: 'toggleGlobal' }, (res) => {
       if (res) {
         refreshState();
+        if (activeTabId) {
+          chrome.tabs.reload(activeTabId);
+        }
       }
     });
   });
@@ -305,6 +308,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Whitelist Toggle Change
   whitelistToggle.addEventListener('change', () => {
     if (!activeDomain) return;
+
+    // Immediate UI feedback
+    statusSubtitle.textContent = whitelistToggle.checked ? 'Reloading with Ads Allowed...' : 'Reloading with Protection...';
 
     chrome.runtime.sendMessage(
       { action: 'toggleWhitelist', domain: activeDomain, tabId: activeTabId },
