@@ -315,5 +315,57 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // Extension Version & Update Checker
+  const currentVersionBadge = document.getElementById('currentVersionBadge');
+  const checkUpdateBtn = document.getElementById('checkUpdateBtn');
+  const updateStatusBox = document.getElementById('updateStatusBox');
+
+  const currentVer = (chrome.runtime && chrome.runtime.getManifest) ? chrome.runtime.getManifest().version : '1.4.0';
+  if (currentVersionBadge) {
+    currentVersionBadge.textContent = 'v' + currentVer;
+  }
+
+  if (checkUpdateBtn) {
+    checkUpdateBtn.addEventListener('click', async () => {
+      checkUpdateBtn.disabled = true;
+      checkUpdateBtn.textContent = 'Checking...';
+      updateStatusBox.style.display = 'block';
+      updateStatusBox.innerHTML = '<span style="color:#00f2fe;">Checking https://ampblock.itsupport.com.bd for updates...</span>';
+
+      try {
+        const res = await fetch('https://ampblock.itsupport.com.bd/version.json', { cache: 'no-cache' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const remoteData = await res.json();
+        const latestVer = remoteData.version || '1.4.0';
+
+        if (latestVer !== currentVer) {
+          updateStatusBox.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div>
+                <strong style="color:#10b981;">🎉 New Update Available: v${latestVer}</strong> (Installed: v${currentVer})
+                <div style="margin-top:6px; font-size:12px; color:#cbd5e1;">${(remoteData.changelog || []).join(' • ')}</div>
+              </div>
+              <a href="https://ampblock.itsupport.com.bd/downloads/AmpBlock-Pro.zip" class="primary-btn" style="text-decoration:none; padding:6px 14px; font-size:12px;">📥 Download v${latestVer} (.ZIP)</a>
+            </div>
+          `;
+        } else {
+          updateStatusBox.innerHTML = `
+            <span style="color:#10b981;">✅ You are running the latest version of AmpBlock Pro (v${currentVer}). No updates needed!</span>
+          `;
+        }
+      } catch (err) {
+        updateStatusBox.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <span>Current version is <strong>v${currentVer}</strong>. (Server check status: Offline or DNS pending)</span>
+            <a href="https://ampblock.itsupport.com.bd/download.html" target="_blank" class="action-btn" style="text-decoration:none; padding:4px 10px; font-size:12px;">Visit Download Center</a>
+          </div>
+        `;
+      } finally {
+        checkUpdateBtn.disabled = false;
+        checkUpdateBtn.textContent = '🔄 Check for Updates';
+      }
+    });
+  }
+
   loadDashboard();
 });

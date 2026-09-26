@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AmpBlock Pro",
-  "version": "1.3.1",
-  "description": "Ultra-powerful Ad & Popup Blocker — YouTube Ultra Buster v4.0, Anti-Adblock Defuser, Element Zapper, and 128 DNR Rules.",
+  "version": "1.4.0",
+  "description": "Ultra-powerful Ad & Popup Blocker — YouTube Ultra Buster, Smart OAuth SSO Protection, Anti-Adblock Defuser, Element Zapper, and 128 DNR Rules.",
   "author": "Arif (https://arifmahmud.com/)",
   "homepage_url": "https://itsupport.com.bd",
   "icons": {

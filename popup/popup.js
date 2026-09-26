@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const shieldLogo = document.getElementById('shieldLogo');
   const zapperBtn = document.getElementById('zapperBtn');
   const openSettingsBtn = document.getElementById('openSettingsBtn');
+  const popupVersionPill = document.getElementById('popupVersionPill');
+
+  if (popupVersionPill && chrome.runtime && chrome.runtime.getManifest) {
+    popupVersionPill.textContent = 'v' + chrome.runtime.getManifest().version;
+  }
 
   // Whitelist Drawer Elements
   const whitelistDrawer = document.getElementById('whitelistDrawer');

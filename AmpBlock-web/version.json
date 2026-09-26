@@ -1,0 +1,16 @@
+{
+  "name": "AmpBlock Pro",
+  "version": "1.4.0",
+  "releaseDate": "2026-09-26",
+  "downloadUrl": "https://ampblock.itsupport.com.bd/downloads/AmpBlock-Pro.zip",
+  "fileSize": "75 KB",
+  "manifestVersion": 3,
+  "changelog": [
+    "Fixed Google & Facebook OAuth login compatibility (no blocked auth popups)",
+    "Fixed Trusted Site whitelist bypass for SSO and popups",
+    "Dynamic cosmetic CSS injection - no leftover layout breaks when ads are allowed",
+    "Safe Bot-Verification for reCAPTCHA and Cloudflare Turnstile",
+    "Auto-reload on whitelist toggle for instant results",
+    "High-priority DNR dynamic rules for authentication providers"
+  ]
+}
